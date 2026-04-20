@@ -1,5 +1,7 @@
 # 🛒 Sistema de Vendas — Delphi VCL + FireDAC + SQL Server
 
+![Main Menu](./assets/MainMenu.png)
+
 > Sistema completo de gestão comercial desenvolvido em Delphi (VCL), com arquitetura em camadas, herança visual, controle de estoque, geração de relatórios e sistema de acesso por usuário.
 
 ---
@@ -549,6 +551,8 @@ Validações:
 ---
 
 ## Gráficos e Dashboard
+
+![Dashboard](./assets/MainMenuClean.png)
 
 O DataModule `TdtmGrafico` contém as queries pré-configuradas para alimentar os gráficos:
 
