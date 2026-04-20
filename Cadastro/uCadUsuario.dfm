@@ -69,7 +69,7 @@ inherited frmCadUsuario: TfrmCadUsuario
     SQL.Strings = (
       'select usuarioId,'
       'nome,'
-      'senha'
+      'senha '
       'from usuarios')
     object QryListagemusuarioId: TFDAutoIncField
       DisplayLabel = 'C'#243'digo'
