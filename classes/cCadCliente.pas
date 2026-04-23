@@ -121,8 +121,6 @@ begin
         Qry.ParamByName('clienteId').AsInteger := F_clienteId;
         Qry.ExecSQL;
       end;
-
-      Qry.ExecSQL;
       Result := True;
 
     Except

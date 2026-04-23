@@ -39,6 +39,7 @@ end;
 
 
 {$ENDREGION}
+
 {$REGION 'Descriptografar'}
 function  Descriptografar(const aEntrada:string) : string;
 var i, iQtdeEnt, iIntervalo:Integer;

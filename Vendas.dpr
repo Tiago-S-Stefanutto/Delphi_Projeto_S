@@ -48,7 +48,15 @@ uses
   uObservacaoClientes in 'ObservacaoClientes\uObservacaoClientes.pas' {frmObservacaoCliente},
   cLog in 'Log_Registros\cLog.pas' {$R *.res},
   uTelaHerancaPesquisa in 'Heranca\uTelaHerancaPesquisa.pas' {frmTelaHerancaPesquisa},
-  uLogSistema in 'Log_Registros\uLogSistema.pas' {frmLogSistema};
+  uLogSistema in 'Log_Registros\uLogSistema.pas' {frmLogSistema},
+  uCadGrupoCliente in 'Cadastro\uCadGrupoCliente.pas' {frmCadGrupoCliente},
+  cCadGrupoCliente in 'classes\cCadGrupoCliente.pas',
+  uCadSegmentoCliente in 'Cadastro\uCadSegmentoCliente.pas' {frmCadSegmentoCliente},
+  cCadSegmentoCliente in 'classes\cCadSegmentoCliente.pas',
+  uCadPrimeiroContatoCliente in 'Cadastro\uCadPrimeiroContatoCliente.pas' {frmCadPrimeiroContato},
+  cCadPrimeiroContatoCliente in 'classes\cCadPrimeiroContatoCliente.pas',
+  cCadRegiaoCliente in 'classes\cCadRegiaoCliente.pas',
+  uCadRegiaoCliente in 'Cadastro\uCadRegiaoCliente.pas' {frmCadRegiaoCliente};
 
 {$R *.res}
 

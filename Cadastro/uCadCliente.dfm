@@ -12,6 +12,8 @@ inherited TfrmCadCliente: TTfrmCadCliente
     ExplicitWidth = 973
     ExplicitHeight = 392
     inherited TabListagem: TTabSheet
+      ExplicitLeft = 4
+      ExplicitTop = 24
       ExplicitWidth = 965
       ExplicitHeight = 364
       inherited Panel1: TPanel
@@ -324,31 +326,42 @@ inherited TfrmCadCliente: TTfrmCadCliente
         Columns = <
           item
             Expanded = False
-            FieldName = 'clienteId'
-            Width = 57
-            Visible = True
-          end
-          item
-            Expanded = False
             FieldName = 'clienteStatusId'
             Visible = True
           end
           item
             Expanded = False
+            FieldName = 'clienteId'
+            Visible = True
+          end
+          item
+            Expanded = False
             FieldName = 'nome'
-            Width = 305
             Visible = True
           end
           item
             Expanded = False
             FieldName = 'endereco'
-            Width = 290
+            Visible = True
+          end
+          item
+            Expanded = False
+            FieldName = 'cidade'
+            Visible = True
+          end
+          item
+            Expanded = False
+            FieldName = 'bairro'
+            Visible = True
+          end
+          item
+            Expanded = False
+            FieldName = 'estado'
             Visible = True
           end
           item
             Expanded = False
             FieldName = 'cep'
-            Width = 68
             Visible = True
           end
           item
@@ -363,18 +376,40 @@ inherited TfrmCadCliente: TTfrmCadCliente
           end
           item
             Expanded = False
-            FieldName = 'datanascimento'
+            FieldName = 'dataNascimento'
             Visible = True
           end
           item
             Expanded = False
             FieldName = 'pessoaTipoId'
             Visible = True
+          end
+          item
+            Expanded = False
+            FieldName = 'grupoClienteId'
+            Visible = True
+          end
+          item
+            Expanded = False
+            FieldName = 'segmentoClienteId'
+            Visible = True
+          end
+          item
+            Expanded = False
+            FieldName = 'primeiroContatoClienteId'
+            Visible = True
+          end
+          item
+            Expanded = False
+            FieldName = 'regiaoClienteId'
+            Visible = True
           end>
       end
     end
     inherited tabManutencao: TTabSheet
       OnEnter = tabManutencaoEnter
+      ExplicitLeft = 4
+      ExplicitTop = 24
       ExplicitWidth = 965
       ExplicitHeight = 364
       object lblCEP: TLabel
@@ -606,6 +641,86 @@ inherited TfrmCadCliente: TTfrmCadCliente
         OnChange = edtTelefoneChange
       end
     end
+    object TabSheet1: TTabSheet
+      Caption = 'CRM'
+      ImageIndex = 2
+      object Label7: TLabel
+        Left = 23
+        Top = 13
+        Width = 65
+        Height = 13
+        Caption = 'Grupo Cliente'
+      end
+      object Label8: TLabel
+        Left = 439
+        Top = 15
+        Width = 84
+        Height = 13
+        Caption = 'Segmento Cliente'
+      end
+      object Label9: TLabel
+        Left = 23
+        Top = 61
+        Width = 80
+        Height = 13
+        Caption = 'Primeiro Contato'
+      end
+      object Label10: TLabel
+        Left = 439
+        Top = 61
+        Width = 69
+        Height = 13
+        Caption = 'Regiao Cliente'
+      end
+      object lkpGrupoCliente: TDBLookupComboBox
+        Left = 23
+        Top = 34
+        Width = 394
+        Height = 21
+        DataField = 'grupoClienteId'
+        DataSource = dtsListagem
+        KeyField = 'grupoClienteId'
+        ListField = 'descricao'
+        ListSource = dtsGrupoCliente
+        TabOrder = 0
+      end
+      object lkpSegmentoCliente: TDBLookupComboBox
+        Left = 439
+        Top = 34
+        Width = 509
+        Height = 21
+        DataField = 'segmentoClienteId'
+        DataSource = dtsListagem
+        KeyField = 'segmentoClienteId'
+        ListField = 'descricao'
+        ListSource = dtsSegmentoCliente
+        TabOrder = 1
+      end
+      object lkpPrimeiroContatoCliente: TDBLookupComboBox
+        Left = 23
+        Top = 80
+        Width = 394
+        Height = 21
+        DataField = 'primeiroContatoClienteId'
+        DataSource = dtsListagem
+        KeyField = 'primeiroContatoClienteId'
+        ListField = 'descricao'
+        ListSource = dtsPrimeiroContato
+        TabOrder = 2
+      end
+      object lkpRegiaoCliente: TDBLookupComboBox
+        Left = 439
+        Top = 80
+        Width = 509
+        Height = 21
+        DataField = 'regiaoClienteId'
+        DataSource = dtsListagem
+        KeyField = 'regiaoClienteId'
+        ListField = 'descricao'
+        ListSource = dtsRegiaoCliente
+        TabOrder = 3
+      end
+    end
   end
   inherited pnlRodaPe: TPanel
     Top = 392
@@ -648,17 +763,36 @@ inherited TfrmCadCliente: TTfrmCadCliente
     end
   end
   inherited dtsListagem: TDataSource
-    Left = 572
-    Top = 128
+    Left = 708
+    Top = 24
   end
   inherited QryListagem: TFDQuery
     SQL.Strings = (
-      
-        'SELECT '#10'  clienteId,'#10'  nome,'#10'  endereco,'#10'  cidade,'#10'  bairro,'#10'  e' +
-        'stado,'#10'  cep,'#10'  telefone,'#10'  email,'#10'  dataNascimento,'#10'  clienteSt' +
-        'atusId, '#10'  pessoaTipoId '#10'FROM clientes')
-    Left = 628
-    Top = 136
+      'SELECT '#10'  clienteId,'#10'  '
+      'nome,'#10'  '
+      'endereco,'#10'  '
+      'cidade,'#10' '
+      'bairro,'#10'  '
+      'estado,'#10'  '
+      'cep,'#10'  '
+      'telefone,'#10'  '
+      'email,'#10'  '
+      'dataNascimento,'#10'  '
+      'clienteStatusId,'#10'  '
+      'pessoaTipoId,'#10'  '
+      'grupoClienteId,'#10'  '
+      'segmentoClienteId,'#10'  '
+      'primeiroContatoClienteId,'
+      'regiaoClienteId  '
+      #10'FROM clientes')
+    Left = 660
+    Top = 24
+    object QryListagemclienteStatusId: TIntegerField
+      DisplayLabel = 'Status'
+      FieldName = 'clienteStatusId'
+      Origin = 'clienteStatusId'
+      Required = True
+    end
     object QryListagemclienteId: TFDAutoIncField
       DisplayLabel = 'C'#243'digo'
       FieldName = 'clienteId'
@@ -691,7 +825,7 @@ inherited TfrmCadCliente: TTfrmCadCliente
       Size = 40
     end
     object QryListagemestado: TStringField
-      DisplayLabel = 'Estado'
+      DisplayLabel = 'UF'
       FieldName = 'estado'
       Origin = 'estado'
       Size = 2
@@ -714,22 +848,36 @@ inherited TfrmCadCliente: TTfrmCadCliente
       Origin = 'email'
       Size = 100
     end
-    object QryListagemdatanascimento: TSQLTimeStampField
-      DisplayLabel = 'Data de Nascimento'
-      FieldName = 'datanascimento'
-      Origin = 'datanascimento'
-    end
-    object QryListagemclienteStatusId: TIntegerField
-      DisplayLabel = 'Status'
-      FieldName = 'clienteStatusId'
-      Origin = 'clienteStatusId'
-      Required = True
+    object QryListagemdataNascimento: TSQLTimeStampField
+      DisplayLabel = 'Data Nascimento'
+      FieldName = 'dataNascimento'
+      Origin = 'dataNascimento'
     end
     object QryListagempessoaTipoId: TIntegerField
-      DisplayLabel = 'F'#237'sica / Jur'#237'dica'
+      DisplayLabel = 'Tipo Pessoa'
       FieldName = 'pessoaTipoId'
       Origin = 'pessoaTipoId'
       Required = True
+    end
+    object QryListagemgrupoClienteId: TIntegerField
+      DisplayLabel = 'Grupo'
+      FieldName = 'grupoClienteId'
+      Origin = 'grupoClienteId'
+    end
+    object QryListagemsegmentoClienteId: TIntegerField
+      DisplayLabel = 'Segmento'
+      FieldName = 'segmentoClienteId'
+      Origin = 'segmentoClienteId'
+    end
+    object QryListagemprimeiroContatoClienteId: TIntegerField
+      DisplayLabel = 'Primeiro Contato'
+      FieldName = 'primeiroContatoClienteId'
+      Origin = 'primeiroContatoClienteId'
+    end
+    object QryListagemregiaoClienteId: TIntegerField
+      DisplayLabel = 'Regi'#227'o'
+      FieldName = 'regiaoClienteId'
+      Origin = 'regiaoClienteId'
     end
   end
   object QryStatus: TFDQuery
@@ -739,8 +887,8 @@ inherited TfrmCadCliente: TTfrmCadCliente
       
         'SELECT clienteStatusId, descricao '#10'FROM clienteStatus'#10'ORDER BY c' +
         'lienteStatusId')
-    Left = 588
-    Top = 192
+    Left = 572
+    Top = 288
     object QryStatusclienteStatusId: TIntegerField
       FieldName = 'clienteStatusId'
       Origin = 'clienteStatusId'
@@ -754,8 +902,8 @@ inherited TfrmCadCliente: TTfrmCadCliente
   end
   object dtsStatus: TDataSource
     DataSet = QryStatus
-    Left = 588
-    Top = 248
+    Left = 580
+    Top = 336
   end
   object QryTipoPessoa: TFDQuery
     Active = True
@@ -765,16 +913,16 @@ inherited TfrmCadCliente: TTfrmCadCliente
         'SELECT pessoaTipoId, descricao '#10'FROM pessoaTipo ORDER BY pessoaT' +
         'ipoId')
     Left = 676
-    Top = 184
+    Top = 280
   end
   object dtsTipoPessoa: TDataSource
     DataSet = QryTipoPessoa
-    Left = 684
-    Top = 232
+    Left = 676
+    Top = 336
   end
   object imgStatus: TImageList
-    Left = 684
-    Top = 128
+    Left = 708
+    Top = 88
     Bitmap = {
       494C010105000900040010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000002000000001002000000000000020
@@ -1046,5 +1194,106 @@ inherited TfrmCadCliente: TTfrmCadCliente
       80018001800180018001800180018001C003C003C003C003E007E007E007E007
       F00FF00FF00FF00FFFFFFFFFFFFFFFFF00000000000000000000000000000000
       000000000000}
+  end
+  object QryGrupoCliente: TFDQuery
+    Connection = dtmPrincipal.ConexaoDB
+    SQL.Strings = (
+      'SELECT grupoClienteId, descricao'
+      'FROM grupoCliente'
+      'WHERE statusId = 1')
+    Left = 484
+    Top = 288
+    object QryGrupoClientegrupoClienteId: TFDAutoIncField
+      FieldName = 'grupoClienteId'
+      Origin = 'grupoClienteId'
+      ProviderFlags = [pfInWhere, pfInKey]
+      ReadOnly = True
+    end
+    object QryGrupoClientedescricao: TStringField
+      FieldName = 'descricao'
+      Origin = 'descricao'
+      Size = 100
+    end
+  end
+  object dtsGrupoCliente: TDataSource
+    DataSet = QryGrupoCliente
+    Left = 476
+    Top = 336
+  end
+  object QrySegmentoCliente: TFDQuery
+    Connection = dtmPrincipal.ConexaoDB
+    SQL.Strings = (
+      'SELECT segmentoClienteId, descricao'
+      'FROM segmentoCliente'
+      'WHERE statusId = 1')
+    Left = 380
+    Top = 288
+    object QrySegmentoClientesegmentoClienteId: TFDAutoIncField
+      FieldName = 'segmentoClienteId'
+      Origin = 'segmentoClienteId'
+      ProviderFlags = [pfInWhere, pfInKey]
+      ReadOnly = True
+    end
+    object QrySegmentoClientedescricao: TStringField
+      FieldName = 'descricao'
+      Origin = 'descricao'
+      Size = 100
+    end
+  end
+  object dtsSegmentoCliente: TDataSource
+    DataSet = QrySegmentoCliente
+    Left = 380
+    Top = 344
+  end
+  object QryPrimeiroContato: TFDQuery
+    Connection = dtmPrincipal.ConexaoDB
+    SQL.Strings = (
+      'SELECT primeiroContatoClienteId, descricao '
+      'FROM primeiroContatoCliente'
+      'WHERE statusId = 1')
+    Left = 268
+    Top = 288
+    object QryPrimeiroContatoprimeiroContatoClienteId: TFDAutoIncField
+      FieldName = 'primeiroContatoClienteId'
+      Origin = 'primeiroContatoClienteId'
+      ProviderFlags = [pfInWhere, pfInKey]
+      ReadOnly = True
+    end
+    object QryPrimeiroContatodescricao: TStringField
+      FieldName = 'descricao'
+      Origin = 'descricao'
+      Size = 70
+    end
+  end
+  object dtsPrimeiroContato: TDataSource
+    DataSet = QryPrimeiroContato
+    Left = 276
+    Top = 344
+  end
+  object QryRegiaoCliente: TFDQuery
+    Connection = dtmPrincipal.ConexaoDB
+    SQL.Strings = (
+      'SELECT regiaoClienteId, descricao '
+      'FROM regiaoCliente'
+      'WHERE statusId = 1'
+      '')
+    Left = 172
+    Top = 288
+    object QryRegiaoClienteregiaoClienteId: TFDAutoIncField
+      FieldName = 'regiaoClienteId'
+      Origin = 'regiaoClienteId'
+      ProviderFlags = [pfInWhere, pfInKey]
+      ReadOnly = True
+    end
+    object QryRegiaoClientedescricao: TStringField
+      FieldName = 'descricao'
+      Origin = 'descricao'
+      Size = 100
+    end
+  end
+  object dtsRegiaoCliente: TDataSource
+    DataSet = QryRegiaoCliente
+    Left = 164
+    Top = 336
   end
 end

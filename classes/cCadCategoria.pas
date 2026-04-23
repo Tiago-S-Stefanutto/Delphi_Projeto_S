@@ -59,7 +59,7 @@ begin
 
   if MessageDlg('Apagar o Registro: '+#13+#13+
                 'C digo: '+IntToStr(F_categoriasId)+#13+
-                'Descri  o: '+F_descricao,mtConfirmation,[mbYes, mbNo],0)=mrNo
+                'Descrição: '+F_descricao,mtConfirmation,[mbYes, mbNo],0)=mrNo
   then begin
      abort;
   end;

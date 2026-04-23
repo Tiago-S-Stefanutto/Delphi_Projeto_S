@@ -26,33 +26,19 @@ type
     edtEmail: TLabeledEdit;
     edtDataNascimento: TDateEdit;
     lblData: TLabel;
-  // colunas da consulta SQL usando o Grid
-    QryListagemclienteId: TFDAutoIncField;
-    QryListagemnome: TStringField;
-    QryListagemendereco: TStringField;
-    QryListagemcidade: TStringField;
-    QryListagembairro: TStringField;
-    QryListagemestado: TStringField;
-    QryListagemcep: TStringField;
-    QryListagemtelefone: TStringField;
-    QryListagememail: TStringField;
-    QryListagemdatanascimento: TSQLTimeStampField;
     edtEstado: TLabeledEdit;
     QryStatus: TFDQuery;
     dtsStatus: TDataSource;
     lcbStatus: TDBLookupComboBox;
     QryStatusclienteStatusId: TIntegerField;
     QryStatusdescricao: TStringField;
-    QryListagemclienteStatusId: TIntegerField;
     QryTipoPessoa: TFDQuery;
     dtsTipoPessoa: TDataSource;
     lcbTipoPessoa: TDBLookupComboBox;
-    QryListagempessoaTipoId: TIntegerField;
     lblCpfCnpj: TLabel;
     edtCpfCnpj: TEdit;
     edtCEP: TEdit;
     edtTelefone: TEdit;
-    imgStatus: TImageList;
     sbtnCep: TSpeedButton;
     imagemStatus: TImage;
     lblNomeStatus: TLabel;
@@ -71,6 +57,48 @@ type
     Label4: TLabel;
     lblStatus: TLabel;
     lblPessoa: TLabel;
+    TabSheet1: TTabSheet;
+    imgStatus: TImageList;
+    lkpGrupoCliente: TDBLookupComboBox;
+    lkpSegmentoCliente: TDBLookupComboBox;
+    lkpPrimeiroContatoCliente: TDBLookupComboBox;
+    Label7: TLabel;
+    Label8: TLabel;
+    Label9: TLabel;
+    QryGrupoCliente: TFDQuery;
+    dtsGrupoCliente: TDataSource;
+    QryGrupoClientegrupoClienteId: TFDAutoIncField;
+    QryGrupoClientedescricao: TStringField;
+    QrySegmentoCliente: TFDQuery;
+    dtsSegmentoCliente: TDataSource;
+    QrySegmentoClientesegmentoClienteId: TFDAutoIncField;
+    QrySegmentoClientedescricao: TStringField;
+    QryPrimeiroContato: TFDQuery;
+    dtsPrimeiroContato: TDataSource;
+    QryPrimeiroContatoprimeiroContatoClienteId: TFDAutoIncField;
+    QryPrimeiroContatodescricao: TStringField;
+    QryListagemclienteId: TFDAutoIncField;
+    QryListagemnome: TStringField;
+    QryListagemendereco: TStringField;
+    QryListagemcidade: TStringField;
+    QryListagembairro: TStringField;
+    QryListagemestado: TStringField;
+    QryListagemcep: TStringField;
+    QryListagemtelefone: TStringField;
+    QryListagememail: TStringField;
+    QryListagemdataNascimento: TSQLTimeStampField;
+    QryListagemclienteStatusId: TIntegerField;
+    QryListagempessoaTipoId: TIntegerField;
+    QryListagemgrupoClienteId: TIntegerField;
+    QryListagemsegmentoClienteId: TIntegerField;
+    QryListagemprimeiroContatoClienteId: TIntegerField;
+    lkpRegiaoCliente: TDBLookupComboBox;
+    Label10: TLabel;
+    QryRegiaoCliente: TFDQuery;
+    dtsRegiaoCliente: TDataSource;
+    QryListagemregiaoClienteId: TIntegerField;
+    QryRegiaoClienteregiaoClienteId: TFDAutoIncField;
+    QryRegiaoClientedescricao: TStringField;
     procedure btnAlterarClick(Sender: TObject);
     procedure btnNovoClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
@@ -375,11 +403,15 @@ end;
 
 procedure TTfrmCadCliente.grdListagemDrawColumnCell(Sender: TObject; const Rect: TRect; DataCol: Integer; Column: TColumn;
   State: TGridDrawState);
-var StatusId: Integer;
-    ImgIndex: Integer;
-    TipoPessoa: string;
+var
+  StatusId: Integer;
+  ImgIndex: Integer;
+  TipoPessoa: string;
+  DescGrupo: string;
 begin
- inherited;
+  inherited;
+
+  // Pessoa Física / Jurídica
   if Column.FieldName = 'pessoaTipoId' then
   begin
     if Column.Field.AsInteger = 1 then
@@ -391,24 +423,23 @@ begin
     grdListagem.Canvas.TextOut(Rect.Left + 2, Rect.Top + 2, TipoPessoa);
   end
 
-
+  // Status com imagem
   else if Column.FieldName = 'clienteStatusId' then
   begin
     StatusId := Column.Field.AsInteger;
 
     case StatusId of
-      1: ImgIndex := 0; // verde
-      2: ImgIndex := 1; // vermelho
-      3: ImgIndex := 2; // amarelo
-      4: ImgIndex := 3; // preto
-      5: ImgIndex := 4; // roxo
+      1: ImgIndex := 0;
+      2: ImgIndex := 1;
+      3: ImgIndex := 2;
+      4: ImgIndex := 3;
+      5: ImgIndex := 4;
     else
       ImgIndex := -1;
     end;
 
     grdListagem.Canvas.FillRect(Rect);
 
-    // centralizar imagem
     if ImgIndex >= 0 then
       imgStatus.Draw(
         grdListagem.Canvas,
@@ -416,8 +447,60 @@ begin
         Rect.Top + (Rect.Height div 2) - 8,
         ImgIndex
       );
-
   end
+
+  // Grupo Cliente
+  else if Column.FieldName = 'grupoClienteId' then
+  begin
+    grdListagem.Canvas.FillRect(Rect);
+    DescGrupo := '';
+
+    if not QryGrupoCliente.IsEmpty then
+      if QryGrupoCliente.Locate('grupoClienteId', Column.Field.AsInteger, []) then
+        DescGrupo := QryGrupoCliente.FieldByName('descricao').AsString;
+
+    grdListagem.Canvas.TextOut(Rect.Left + 2, Rect.Top + 2, DescGrupo);
+  end
+
+  // Segmento Cliente
+  else if Column.FieldName = 'segmentoClienteId' then
+  begin
+    grdListagem.Canvas.FillRect(Rect);
+    DescGrupo := '';
+
+    if not QrySegmentoCliente.IsEmpty then
+      if QrySegmentoCliente.Locate('segmentoClienteId', Column.Field.AsInteger, []) then
+        DescGrupo := QrySegmentoCliente.FieldByName('descricao').AsString;
+
+    grdListagem.Canvas.TextOut(Rect.Left + 2, Rect.Top + 2, DescGrupo);
+  end
+
+  // Primeiro Contato
+  else if Column.FieldName = 'primeiroContatoClienteId' then
+  begin
+    grdListagem.Canvas.FillRect(Rect);
+    DescGrupo := '';
+
+    if not QryPrimeiroContato.IsEmpty then
+      if QryPrimeiroContato.Locate('primeiroContatoClienteId', Column.Field.AsInteger, []) then
+        DescGrupo := QryPrimeiroContato.FieldByName('descricao').AsString;
+
+    grdListagem.Canvas.TextOut(Rect.Left + 2, Rect.Top + 2, DescGrupo);
+  end
+
+   // Região
+  else if Column.FieldName = 'regiaoClienteId' then
+  begin
+    grdListagem.Canvas.FillRect(Rect);
+    DescGrupo := '';
+
+    if not QryRegiaoCliente.IsEmpty then
+      if QryRegiaoCliente.Locate('regiaoClienteId', Column.Field.AsInteger, []) then
+        DescGrupo := QryRegiaoCliente.FieldByName('descricao').AsString;
+
+    grdListagem.Canvas.TextOut(Rect.Left + 2, Rect.Top + 2, DescGrupo);
+  end
+
   else
     grdListagem.DefaultDrawColumnCell(Rect, DataCol, Column, State);
 end;
@@ -677,6 +760,10 @@ begin
   inherited;
   QryStatus.Open;
   QryTipoPessoa.Open;
+  QryGrupoCliente.Open;
+  QrySegmentoCliente.Open;
+  QryPrimeiroContato.Open;
+  QryRegiaoCliente.Open;
 
 end;
 
@@ -688,6 +775,10 @@ begin
 
     QryStatus.Close;
     QryTipoPessoa.Close;
+    QryGrupoCliente.Close;
+    QrySegmentoCliente.Close;
+    QryPrimeiroContato.Close;
+    QryRegiaoCliente.Close;
 
 end;
 end.

@@ -242,6 +242,26 @@
             <Form>frmLogSistema</Form>
             <FormType>dfm</FormType>
         </DCCReference>
+        <DCCReference Include="Cadastro\uCadGrupoCliente.pas">
+            <Form>frmCadGrupoCliente</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
+        <DCCReference Include="classes\cCadGrupoCliente.pas"/>
+        <DCCReference Include="Cadastro\uCadSegmentoCliente.pas">
+            <Form>frmCadSegmentoCliente</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
+        <DCCReference Include="classes\cCadSegmentoCliente.pas"/>
+        <DCCReference Include="Cadastro\uCadPrimeiroContatoCliente.pas">
+            <Form>frmCadPrimeiroContato</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
+        <DCCReference Include="classes\cCadPrimeiroContatoCliente.pas"/>
+        <DCCReference Include="classes\cCadRegiaoCliente.pas"/>
+        <DCCReference Include="Cadastro\uCadRegiaoCliente.pas">
+            <Form>frmCadRegiaoCliente</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>

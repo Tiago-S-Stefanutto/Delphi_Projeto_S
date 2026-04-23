@@ -33,6 +33,11 @@ type
     procedure pessoaTipo;
     procedure ClienteObservacao;
     procedure TipoEstoqueProduto;
+    procedure StatusBit;
+    procedure GrupoCliente;
+    procedure SegmentoCliente;
+    procedure PrimeiroContatoCliente;
+    procedure RegiaoCliente;
 end;
 
 implementation
@@ -44,9 +49,14 @@ constructor TAtualizacaoTableMSSQL.Create(aConexao: TFDConnection);
 begin
   ConexaoDB := aConexao;
   Log;
+  StatusBit;
   Categoria;
   ClienteStatus;
   pessoaTipo;
+  GrupoCliente;
+  SegmentoCliente;
+  PrimeiroContatoCliente;
+  RegiaoCliente;
   Cliente;
   ClienteObservacao;
   TipoEstoqueProduto;
@@ -61,6 +71,23 @@ end;
 destructor TAtualizacaoTableMSSQL.Destroy;
 begin
   inherited;
+end;
+
+procedure TAtualizacaoTableMSSQL.GrupoCliente;
+begin
+  if not TabelaExiste('grupoCliente') then
+  begin
+    ExecutaDiretoBancoDeDados(
+    ' CREATE TABLE grupoCliente(  '+
+    ' grupoClienteId int IDENTITY(1,1) NOT NULL,  '+
+    ' descricao  varchar(100) NULL,  '+
+    ' statusId int NOT NULL DEFAULT 1, '+
+    ' PRIMARY KEY (grupoClienteId), '+
+    ' CONSTRAINT FK_GrupoCliente_Status '+
+    ' FOREIGN KEY (statusId) REFERENCES statusBit(statusId) '+
+    ')'
+    );
+  end;
 end;
 
 procedure TAtualizacaoTableMSSQL.Log;
@@ -208,12 +235,12 @@ procedure TAtualizacaoTableMSSQL.Categoria;
 begin
   if not TabelaExiste('categorias') then
   begin
-  ExecutaDiretoBancoDeDados(
-  '    CREATE TABLE categorias(  '+
-	'   categoriasId int IDENTITY(1,1) NOT NULL,  '+
-	'   descricao  varchar(30) NULL,  '+
-	'   PRIMARY KEY (categoriasId)  '
-  );
+    ExecutaDiretoBancoDeDados(
+    '    CREATE TABLE categorias(  '+
+    '   categoriasId int IDENTITY(1,1) NOT NULL,  '+
+    '   descricao  varchar(30) NULL,  '+
+    '   PRIMARY KEY (categoriasId)  '
+    );
   end;
 end;
 
@@ -235,16 +262,96 @@ begin
     ' dataNascimento datetime null, '+
     ' clienteStatusId int NOT NULL DEFAULT 1, '+
     ' pessoaTipoId int NOT NULL DEFAULT 1, '+
+    ' grupoClienteId int NULL, '+
+    ' segmentoClienteId int NULL, '+
+    ' primeiroContatoClienteId int NULL, '+
     ' PRIMARY KEY (clienteId), '+
     ' CONSTRAINT FK_Clientes_Status '+
     ' FOREIGN KEY (clienteStatusId) REFERENCES clienteStatus(clienteStatusId), '+
     ' CONSTRAINT FK_Clientes_PessoaTipo '+
-    ' FOREIGN KEY (pessoaTipoId) REFERENCES pessoaTipo(pessoaTipoId) '+
+    ' FOREIGN KEY (pessoaTipoId) REFERENCES pessoaTipo(pessoaTipoId), '+
+    ' CONSTRAINT FK_Cliente_Grupo '+
+    ' FOREIGN KEY (grupoClienteId) REFERENCES grupoCliente(grupoClienteId), '+
+    ' CONSTRAINT FK_Cliente_Segmento '+
+    ' FOREIGN KEY (segmentoClienteId) REFERENCES segmentoCliente(segmentoClienteId), '+
+    ' CONSTRAINT FK_Cliente_PrimeiroContato '+
+    ' FOREIGN KEY (primeiroContatoClienteId) REFERENCES primeiroContatoCliente(primeiroContatoClienteId) '+
+    ' CONSTRAINT FK_Cliente_Regiao '+
+    ' FOREIGN KEY (regiaoClienteId) REFERENCES regiaoCliente(regiaoClienteId) '+
     ')'
     );
-
   end;
-  // adiciona a coluna clienteStatusId se não existir
+
+  // CRM
+
+  ExecutaDiretoBancoDeDados(
+  'IF COL_LENGTH(''clientes'', ''grupoClienteId'') IS NULL '+
+  'BEGIN '+
+  ' ALTER TABLE clientes ADD grupoClienteId int NULL '+
+  'END'
+  );
+
+  ExecutaDiretoBancoDeDados(
+  'IF COL_LENGTH(''clientes'', ''segmentoClienteId'') IS NULL '+
+  'BEGIN '+
+  ' ALTER TABLE clientes ADD segmentoClienteId int NULL '+
+  'END'
+  );
+
+  ExecutaDiretoBancoDeDados(
+  'IF COL_LENGTH(''clientes'', ''primeiroContatoClienteId'') IS NULL '+
+  'BEGIN '+
+  ' ALTER TABLE clientes ADD primeiroContatoClienteId int NULL '+
+  'END'
+  );
+
+  ExecutaDiretoBancoDeDados(
+  'IF COL_LENGTH(''clientes'', ''regiaoClienteId'') IS NULL '+
+  'BEGIN '+
+  ' ALTER TABLE clientes ADD regiaoClienteId int NULL '+
+  'END'
+  );
+
+  // FKs CRM
+
+  ExecutaDiretoBancoDeDados(
+  'IF NOT EXISTS (SELECT 1 FROM sys.foreign_keys WHERE name = ''FK_Cliente_Grupo'') '+
+  'BEGIN '+
+  ' ALTER TABLE clientes '+
+  ' ADD CONSTRAINT FK_Cliente_Grupo '+
+  ' FOREIGN KEY (grupoClienteId) REFERENCES grupoCliente(grupoClienteId) '+
+  'END'
+  );
+
+  ExecutaDiretoBancoDeDados(
+  'IF NOT EXISTS (SELECT 1 FROM sys.foreign_keys WHERE name = ''FK_Cliente_Segmento'') '+
+  'BEGIN '+
+  ' ALTER TABLE clientes '+
+  ' ADD CONSTRAINT FK_Cliente_Segmento '+
+  ' FOREIGN KEY (segmentoClienteId) REFERENCES segmentoCliente(segmentoClienteId) '+
+  'END'
+  );
+
+  ExecutaDiretoBancoDeDados(
+  'IF NOT EXISTS (SELECT 1 FROM sys.foreign_keys WHERE name = ''FK_Cliente_PrimeiroContato'') '+
+  'BEGIN '+
+  ' ALTER TABLE clientes '+
+  ' ADD CONSTRAINT FK_Cliente_PrimeiroContato '+
+  ' FOREIGN KEY (primeiroContatoClienteId) REFERENCES primeiroContatoCliente(primeiroContatoClienteId) '+
+  'END'
+  );
+
+  ExecutaDiretoBancoDeDados(
+  'IF NOT EXISTS (SELECT 1 FROM sys.foreign_keys WHERE name = ''FK_Cliente_Regiao'') '+
+  'BEGIN '+
+  ' ALTER TABLE clientes '+
+  ' ADD CONSTRAINT FK_Cliente_Regiao '+
+  ' FOREIGN KEY (regiaoClienteId) REFERENCES regiaoCliente(regiaoClienteId) '+
+  'END'
+  );
+
+  // ClienteStatus
+
   ExecutaDiretoBancoDeDados(
   'IF COL_LENGTH(''clientes'', ''clienteStatusId'') IS NULL '+
   'BEGIN '+
@@ -252,8 +359,9 @@ begin
   'END'
   );
 
-  // adiciona a FK clienteStatusId se não existir
-   ExecutaDiretoBancoDeDados(
+  // FK
+
+  ExecutaDiretoBancoDeDados(
   'IF NOT EXISTS (SELECT 1 FROM sys.foreign_keys WHERE name = ''FK_Clientes_Status'') '+
   'BEGIN '+
   ' ALTER TABLE clientes '+
@@ -262,7 +370,8 @@ begin
   'END'
   );
 
-  // adiciona a coluna pessoaTipoId se não existir
+  // PessoaTipo
+
   ExecutaDiretoBancoDeDados(
   'IF COL_LENGTH(''clientes'', ''pessoaTipoId'') IS NULL '+
   'BEGIN '+
@@ -270,7 +379,8 @@ begin
   'END'
   );
 
-  // adiciona FK pessoaTipoId se não existir
+  // Fk
+
   ExecutaDiretoBancoDeDados(
   'IF NOT EXISTS (SELECT 1 FROM sys.foreign_keys WHERE name = ''FK_Clientes_PessoaTipo'') '+
   'BEGIN '+
@@ -316,16 +426,16 @@ begin
   end;
 
   ExecutaDiretoBancoDeDados(
-  'IF NOT EXISTS (SELECT 1 FROM clienteStatus) '+
-  'BEGIN '+
-  ' INSERT INTO clienteStatus (clienteStatusId, descricao) VALUES '+
-  ' (1, ''Ativo''), '+
-  ' (2, ''Bloqueado''), '+
-  ' (3, ''Atenção''), '+
-  ' (4, ''Inativo''), '+
-  ' (5, ''Prospecto'') '+
-  'END'
-  );
+    'IF NOT EXISTS (SELECT 1 FROM clienteStatus) '+
+    'BEGIN '+
+    ' INSERT INTO clienteStatus (clienteStatusId, descricao) VALUES '+
+    ' (1, ''Ativo''), '+
+    ' (2, ''Bloqueado''), '+
+    ' (3, ''Atenção''), '+
+    ' (4, ''Inativo''), '+
+    ' (5, ''Prospecto'') '+
+    'END'
+    );
 end;
 
 procedure TAtualizacaoTableMSSQL.TipoEstoqueProduto;
@@ -358,25 +468,99 @@ begin
   );
 end;
 
+procedure TAtualizacaoTableMSSQL.PrimeiroContatoCliente;
+begin
+  if not TabelaExiste('primeiroContatoCliente') then
+  begin
+  ExecutaDiretoBancoDeDados(
+    ' CREATE TABLE primeiroContatoCliente(  '+
+    ' primeiroContatoClienteId int IDENTITY(1,1) NOT NULL,  '+
+    ' descricao  varchar(70) NULL,  '+
+    ' statusId int NOT NULL DEFAULT 1, '+
+    ' PRIMARY KEY (primeiroContatoClienteId), '+
+    ' CONSTRAINT FK_PrimeiroContato_Status '+
+    ' FOREIGN KEY (statusId) REFERENCES statusBit(statusId) '+
+    ')'
+    );
+  end;
+end;
+
 procedure TAtualizacaoTableMSSQL.Produto;
 begin
   if not TabelaExiste('produtos') then
   begin
     ExecutaDiretoBancoDeDados(
-  '    CREATE TABLE produtos(    '+
-	'	produtoId int IDENTITY(1,1) NOT NULL,  '+
-	'	nome varchar(60) NULL,  '+
-	'	descricao varchar(255) null,  '+
-  ' foto varbinary(max),  '+
-	'	valor decimal(18,5) default 0.00000 null,  '+
-	'	quantidade decimal(18,5) default 0.00000 null,  '+
-	'	categoriasId int null,  '+
-	'	PRIMARY KEY (produtoId),  '+
-	'	CONSTRAINT FK_ProdutosCategorias  '+
-	'	FOREIGN KEY (categoriasId) references categorias(categoriasId)  '+
-	') '
+    '    CREATE TABLE produtos(    '+
+    '	produtoId int IDENTITY(1,1) NOT NULL,  '+
+    '	nome varchar(60) NULL,  '+
+    '	descricao varchar(255) null,  '+
+    ' foto varbinary(max),  '+
+    '	valor decimal(18,5) default 0.00000 null,  '+
+    '	quantidade decimal(18,5) default 0.00000 null,  '+
+    '	categoriasId int null,  '+
+    '	PRIMARY KEY (produtoId),  '+
+    '	CONSTRAINT FK_ProdutosCategorias  '+
+    '	FOREIGN KEY (categoriasId) references categorias(categoriasId)  '+
+    ') '
     );
   end;
+end;
+
+
+procedure TAtualizacaoTableMSSQL.RegiaoCliente;
+begin
+  if not TabelaExiste('regiaoCliente') then
+  begin
+    ExecutaDiretoBancoDeDados(
+      ' CREATE TABLE regiaoCliente(  '+
+      ' regiaoClienteId int IDENTITY(1,1) NOT NULL,  '+
+      ' descricao  varchar(100) NULL,  '+
+      ' statusId int NOT NULL DEFAULT 1, '+
+      ' PRIMARY KEY (regiaoClienteId), '+
+      ' CONSTRAINT FK_RegiaoCliente_Status '+
+      ' FOREIGN KEY (statusId) REFERENCES statusBit(statusId) '+
+      ')'
+    );
+  end;
+end;
+
+procedure TAtualizacaoTableMSSQL.SegmentoCliente;
+begin
+  if not TabelaExiste('segmentoCliente') then
+  begin
+  ExecutaDiretoBancoDeDados(
+    ' CREATE TABLE segmentoCliente(  '+
+    ' segmentoClienteId int IDENTITY(1,1) NOT NULL,  '+
+    ' descricao  varchar(100) NULL,  '+
+    ' statusId int NOT NULL DEFAULT 1, '+
+    ' PRIMARY KEY (segmentoClienteId), '+
+    ' CONSTRAINT FK_SegmentoCliente_Status '+
+    ' FOREIGN KEY (statusId) REFERENCES statusBit(statusId) '+
+    ')'
+    );
+  end;
+end;
+
+procedure TAtualizacaoTableMSSQL.StatusBit;
+begin
+  if not TabelaExiste('statusBit') then
+  begin
+    ExecutaDiretoBancoDeDados(
+    '   Create TABLE statusBit(   '+
+    ' statusId int PRIMARY KEY,   '+
+    ' descricao varchar(20)  '+
+    ' ) '
+    );
+  end;
+
+  ExecutaDiretoBancoDeDados(
+  'IF NOT EXISTS (SELECT 1 FROM statusBit) '+
+  'BEGIN '+
+  ' INSERT INTO statusBit (statusId, descricao) VALUES '+
+  ' (1, ''Ativo''), '+
+  ' (2, ''Inativo'') '+
+  'END'
+  );
 end;
 
 

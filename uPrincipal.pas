@@ -16,7 +16,8 @@ uses
   uDtmGrafico, VclTee.TeeGDIPlus, VCLTee.TeEngine, VCLTee.Series,
   VCLTee.TeeProcs, VCLTee.Chart, VCLTee.DBChart, cArquivoIni, cFuncao,
   cAtualizacaoCampoMSSQL, Vcl.Buttons, System.ImageList, Vcl.ImgList,Vcl.Imaging.pngimage
-  , cLog, uLogSistema ;
+  , cLog, uLogSistema, uCadGrupoCliente, uCadSegmentoCliente,
+  uCadPrimeiroContatoCliente, uCadRegiaoCliente;
 
 type
   TfrmPrincipal = class(TForm)
@@ -29,7 +30,7 @@ type
     pnlTop: TPanel;
     {$ENDREGION}
 
-    {$REGION 'Gr√°ficos do Dashboard'}
+    {$REGION 'Gr·ficos do Dashboard'}
     DBChart1: TDBChart;
     DBChart2: TDBChart;
     Series2: TPieSeries;
@@ -50,10 +51,10 @@ type
     btnLog: TSpeedButton;
     btnProduto: TSpeedButton;
     btnVenda: TSpeedButton;
-    Image1: TImage;
+    imgLogo: TImage;
     {$ENDREGION}
 
-    {$REGION 'Eventos do formul√°rio'}
+    {$REGION 'Eventos do formul·rio'}
     procedure FormCreate(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure FormShow(Sender: TObject);
@@ -64,7 +65,7 @@ type
     procedure TreeView1CustomDrawItem(Sender: TCustomTreeView; Node: TTreeNode; State: TCustomDrawState; var DefaultDraw: Boolean);
     {$ENDREGION}
 
-    {$REGION 'Eventos dos bot√µes de atalho'}
+    {$REGION 'Eventos dos botıes de atalho'}
     procedure btnDashboardClick(Sender: TObject);
     procedure btnVendaClick(Sender: TObject);
     procedure btnDesligarClick(Sender: TObject);
@@ -79,7 +80,7 @@ type
     procedure tmrAtualizaDashboardTimer(Sender: TObject);
     {$ENDREGION}
 
-    {$REGION 'Procedures p√∫blicas de status/clientes'}
+    {$REGION 'Procedures p˙blicas de status/clientes'}
     procedure AtualizarStatusCliente;
     {$ENDREGION}
 
@@ -91,7 +92,7 @@ type
     {$ENDREGION}
 
   public
-    {$REGION 'Membros p√∫blicos'}
+    {$REGION 'Membros p˙blicos'}
     procedure AtualizarDashBoard;
     {$ENDREGION}
 
@@ -113,13 +114,13 @@ uses
 
 // =============================================================================
 
-{$REGION 'Inicializa√ß√£o e encerramento do formul√°rio'}
+{$REGION 'InicializaÁ„o e encerramento do formul·rio'}
 
 procedure TfrmPrincipal.FormCreate(Sender: TObject);
 var
-  NoCadastro, NoMov, NoRel, NoUsuario, NoSistema: TTreeNode;
+  NoCadastro, NoMov, NoRel, NoUsuario, NoSistema, NoCRM: TTreeNode;
 begin
-  {$REGION 'Verifica√ß√£o e cria√ß√£o do arquivo INI'}
+  {$REGION 'VerificaÁ„o e criaÁ„o do arquivo INI'}
   if not FileExists(TArquivoIni.ArquivoIni) then
   begin
     TArquivoIni.AtualizarIni('SERVER', 'TipoDataBase', 'MSSQL');
@@ -130,20 +131,20 @@ begin
     TArquivoIni.AtualizarIni('SERVER', 'Password', 'admin');
     TArquivoIni.AtualizarIni('SERVER', 'Database', 'vendas');
 
-    MessageDlg('Arquivo ' + TArquivoIni.ArquivoIni + ' criado com sucesso!' + #13 + 'Configure o arquivo antes de inicializar a aplica√ß√£o!!!', mtInformation, [mbOK], 0);
+    MessageDlg('Arquivo ' + TArquivoIni.ArquivoIni + ' criado com sucesso!' + #13 + 'Configure o arquivo antes de inicializar a aplicaÁ„o!!!', mtInformation, [mbOK], 0);
 
     Application.Terminate;
     Exit;
   end;
   {$ENDREGION}
 
-  {$REGION 'Tela de atualiza√ß√£o do banco'}
+  {$REGION 'Tela de atualizaÁ„o do banco'}
   frmAtualizaDB := TfrmAtualizaDB.Create(Self);
   frmAtualizaDB.Show;
   frmAtualizaDB.Refresh;
   {$ENDREGION}
 
-  {$REGION 'Conex√£o com o banco de dados'}
+  {$REGION 'Conex„o com o banco de dados'}
   dtmPrincipal := TdtmPrincipal.Create(Self);
 
   with dtmPrincipal.ConexaoDB do
@@ -186,11 +187,11 @@ begin
   TeclaEnter.FocusColor := clInfoBk;
   {$ENDREGION}
 
-  {$REGION 'Atualiza√ß√£o do banco de dados'}
+  {$REGION 'AtualizaÁ„o do banco de dados'}
   AtualizacaoBancoDados(frmAtualizaDB);
   {$ENDREGION}
 
-  {$REGION 'Registro das a√ß√µes de acesso'}
+  {$REGION 'Registro das aÁıes de acesso'}
   TAcaoAcesso.CriarAcoes(TfrmCadCategorias, DtmPrincipal.ConexaoDB);
   TAcaoAcesso.CriarAcoes(TTfrmCadCliente, DtmPrincipal.ConexaoDB);
   TAcaoAcesso.CriarAcoes(TfrmCadProduto, DtmPrincipal.ConexaoDB);
@@ -207,6 +208,10 @@ begin
   TAcaoAcesso.CriarAcoes(TfrmUsuarioVsAcoes, DtmPrincipal.ConexaoDB);
   TAcaoAcesso.CriarAcoes(TfrmSelecionarData, DtmPrincipal.ConexaoDB);
   TAcaoAcesso.CriarAcoes(TfrmLogSistema, DtmPrincipal.ConexaoDB);
+  TAcaoAcesso.CriarAcoes(TfrmCadGrupoCliente, DtmPrincipal.ConexaoDB);
+  TAcaoAcesso.CriarAcoes(TfrmCadSegmentoCliente, dtmPrincipal.ConexaoDB);
+  TAcaoAcesso.CriarAcoes(TfrmCadPrimeiroContato, dtmPrincipal.ConexaoDB);
+  TAcaoAcesso.CriarAcoes(TfrmCadRegiaoCliente, dtmPrincipal.ConexaoDB);
 
   TAcaoAcesso.PreencherUsuariosVsAcoes(dtmPrincipal.ConexaoDB);
   {$ENDREGION}
@@ -217,7 +222,7 @@ begin
   frmAtualizaDB.Free;
   {$ENDREGION}
 
-  {$REGION 'Atualiza√ß√£o de status dos clientes'}
+  {$REGION 'AtualizaÁ„o de status dos clientes'}
   try
     AtualizarStatusCliente;
   except
@@ -254,9 +259,9 @@ begin
     end;
   {$ENDREGION}
 
-  {$REGION 'Movimenta√ß√£o'}
-    // Movimenta√ß√£o
-    NoMov := TreeView1.Items.Add(nil, 'Movimenta√ß√£o');
+  {$REGION 'MovimentaÁ„o'}
+    // MovimentaÁ„o
+    NoMov := TreeView1.Items.Add(nil, 'MovimentaÁ„o');
     NoMov.ImageIndex := 1;
     NoMov.SelectedIndex := 1;
 
@@ -267,9 +272,37 @@ begin
     end;
   {$ENDREGION}
 
-  {$REGION 'Relat√≥rios'}
-    // Relat√≥rios
-    NoRel := TreeView1.Items.Add(nil, 'Relat√≥rios');
+  {$REGION 'CRM'}
+    // CRM
+    NoCRM := TreeView1.Items.Add(nil, 'CRM');
+    NoCRM.ImageIndex := 7;
+    NoCRM.SelectedIndex := 7;
+
+    with TreeView1.Items.AddChild(NoCRM, 'Cad. Grupo de Cliente') do
+    begin
+      ImageIndex := 4;
+      SelectedIndex := 5;
+    end;
+    with TreeView1.Items.AddChild(NoCRM, 'Cad. Segmento de Cliente') do
+    begin
+      ImageIndex := 4;
+      SelectedIndex := 5;
+    end;
+    with TreeView1.Items.AddChild(NoCRM, 'Cad. Primeiro Contato Cliente') do
+    begin
+      ImageIndex := 4;
+      SelectedIndex := 5;
+    end;
+    with TreeView1.Items.AddChild(NoCRM, 'Cad. Regiao do Cliente') do
+    begin
+      ImageIndex := 4;
+      SelectedIndex := 5;
+    end;
+  {$ENDREGION}
+
+  {$REGION 'RelatÛrios'}
+    // RelatÛrios
+    NoRel := TreeView1.Items.Add(nil, 'RelatÛrios');
     NoRel.ImageIndex := 2;
     NoRel.SelectedIndex := 2;
 
@@ -305,23 +338,23 @@ begin
     end;
   {$ENDREGION}
 
-  {$REGION 'Usu√°tios'}
-    // Usu√°rios
-    NoUsuario := TreeView1.Items.Add(nil, 'Usu√°rios');
+  {$REGION 'Usu·tios'}
+    // Usu·rios
+    NoUsuario := TreeView1.Items.Add(nil, 'Usu·rios');
     NoUsuario.ImageIndex := 3;
     NoUsuario.SelectedIndex := 3;
 
-    with TreeView1.Items.AddChild(NoUsuario, 'Usu√°rio') do
+    with TreeView1.Items.AddChild(NoUsuario, 'Usu·rio') do
     begin
       ImageIndex := 4;
       SelectedIndex := 5;
     end;
-    with TreeView1.Items.AddChild(NoUsuario, 'Usu√°rios vs A√ß√µes') do
+    with TreeView1.Items.AddChild(NoUsuario, 'Usu·rios vs AÁıes') do
     begin
       ImageIndex := 4;
       SelectedIndex := 5;
     end;
-    with TreeView1.Items.AddChild(NoUsuario, 'A√ß√£o de Acesso') do
+    with TreeView1.Items.AddChild(NoUsuario, 'AÁ„o de Acesso') do
     begin
        ImageIndex := 4;
        SelectedIndex := 5;
@@ -371,7 +404,7 @@ begin
     frmLogin.ShowModal;
   finally
     frmLogin.Release;
-    stbPrincipal.Panels[0].Text := 'Usu√°rio: ' + oUsuarioLogado.nome;
+    stbPrincipal.Panels[0].Text := 'Usu·rio: ' + oUsuarioLogado.nome;
   end;
 end;
 
@@ -392,7 +425,7 @@ end;
 
 // =============================================================================
 
-{$REGION 'Banco de dados ‚Äî atualiza√ß√£o estrutural'}
+{$REGION 'Banco de dados ó atualizaÁ„o estrutural'}
 
 procedure TfrmPrincipal.AtualizacaoBancoDados(aForm: TfrmAtualizaDB);
 var
@@ -446,7 +479,7 @@ end;
 
 // =============================================================================
 
-{$REGION 'Bot√µes de atalho (pnlTop)'}
+{$REGION 'Botıes de atalho (pnlTop)'}
 
 procedure TfrmPrincipal.btnClienteClick(Sender: TObject);
 begin
@@ -512,7 +545,7 @@ end;
 
 // =============================================================================
 
-{$REGION 'TreeView ‚Äî navega√ß√£o e desenho'}
+{$REGION 'TreeView ó navegaÁ„o e desenho'}
 
 procedure TfrmPrincipal.TreeView1DblClick(Sender: TObject);
 var
@@ -526,7 +559,7 @@ begin
   if Assigned(TreeView1.Selected.Parent) then
     Grupo := TreeView1.Selected.Parent.Text
   else
-    Exit; // clicou em um n√≥ raiz
+    Exit; // clicou em um nÛ raiz
 
   {$REGION 'Cadastro'}
   if (Grupo = 'Cadastro') and (Texto = 'Cliente') then
@@ -537,32 +570,43 @@ begin
     TFuncao.CriarForm(TfrmCadProduto, oUsuarioLogado, dtmPrincipal.ConexaoDB)
   {$ENDREGION}
 
-  {$REGION 'Movimenta√ß√£o'}
-  else if (Grupo = 'Movimenta√ß√£o') and (Texto = 'Venda') then
+  {$REGION 'CRM'}
+  else if (Grupo  = 'CRM') and (Texto = 'Cad. Grupo de Cliente') then
+    TFuncao.CriarForm(TfrmCadGrupoCliente, oUsuarioLogado, dtmPrincipal.ConexaoDB)
+  else if (Grupo  = 'CRM') and (Texto = 'Cad. Segmento de Cliente') then
+    TFuncao.CriarForm(TfrmCadSegmentoCliente, oUsuarioLogado, dtmPrincipal.ConexaoDB)
+  else if (Grupo  = 'CRM') and (Texto = 'Cad. Primeiro Contato Cliente') then
+    TFuncao.CriarForm(TfrmCadPrimeiroContato, oUsuarioLogado, dtmPrincipal.ConexaoDB)
+  else if (Grupo  = 'CRM') and (Texto = 'Cad. Regiao do Cliente') then
+    TFuncao.CriarForm(TfrmCadRegiaoCliente, oUsuarioLogado, dtmPrincipal.ConexaoDB)
+  {$ENDREGION}
+
+  {$REGION 'MovimentaÁ„o'}
+  else if (Grupo = 'MovimentaÁ„o') and (Texto = 'Venda') then
     TFuncao.CriarForm(TfrmProVenda, oUsuarioLogado, dtmPrincipal.ConexaoDB)
   {$ENDREGION}
 
-  {$REGION 'Relat√≥rios'}
-  else if (Grupo = 'Relat√≥rios') and (Texto = 'Categoria') then
+  {$REGION 'RelatÛrios'}
+  else if (Grupo = 'RelatÛrios') and (Texto = 'Categoria') then
     TFuncao.CriarRelatorio(TfrmRelCategoria, oUsuarioLogado, dtmPrincipal.ConexaoDB)
-  else if (Grupo = 'Relat√≥rios') and (Texto = 'Cliente') then
+  else if (Grupo = 'RelatÛrios') and (Texto = 'Cliente') then
     TFuncao.CriarRelatorio(TfrmRelCliente, oUsuarioLogado, dtmPrincipal.ConexaoDB)
-  else if (Grupo = 'Relat√≥rios') and (Texto = 'Ficha de Cliente') then
+  else if (Grupo = 'RelatÛrios') and (Texto = 'Ficha de Cliente') then
     TFuncao.CriarRelatorio(TfrmRelClienteFicha, oUsuarioLogado, dtmPrincipal.ConexaoDB)
-  else if (Grupo = 'Relat√≥rios') and (Texto = 'Produto') then
+  else if (Grupo = 'RelatÛrios') and (Texto = 'Produto') then
     TFuncao.CriarRelatorio(TfrmRelProduto, oUsuarioLogado, dtmPrincipal.ConexaoDB)
-  else if (Grupo = 'Relat√≥rios') and (Texto = 'Produto por Categoria') then
+  else if (Grupo = 'RelatÛrios') and (Texto = 'Produto por Categoria') then
     TFuncao.CriarRelatorio(TfrmRelProdutoComCategoria, oUsuarioLogado, dtmPrincipal.ConexaoDB)
-  else if (Grupo = 'Relat√≥rios') and (Texto = 'Venda por Data') then
+  else if (Grupo = 'RelatÛrios') and (Texto = 'Venda por Data') then
     VendaporDataClick(nil)
   {$ENDREGION}
 
-  {$REGION 'Usu√°rios'}
-  else if (Grupo = 'Usu√°rios') and (Texto = 'Usu√°rio') then
+  {$REGION 'Usu·rios'}
+  else if (Grupo = 'Usu·rios') and (Texto = 'Usu·rio') then
     TFuncao.CriarForm(TfrmCadUsuario, oUsuarioLogado, dtmPrincipal.ConexaoDB)
-  else if (Grupo = 'Usu√°rios') and (Texto = 'Usu√°rios vs A√ß√µes') then
+  else if (Grupo = 'Usu·rios') and (Texto = 'Usu·rios vs AÁıes') then
     TFuncao.CriarForm(TfrmUsuarioVsAcoes, oUsuarioLogado, dtmPrincipal.ConexaoDB)
-  else if (Grupo = 'Usu√°rios') and (Texto = 'A√ß√£o de Acesso') then
+  else if (Grupo = 'Usu·rios') and (Texto = 'AÁ„o de Acesso') then
     TFuncao.CriarForm(TfrmCadAcaoAcesso, oUsuarioLogado, dtmPrincipal.ConexaoDB)
   {$ENDREGION}
 
@@ -580,7 +624,7 @@ begin
   DefaultDraw := True;
 
 
-  // reset padr√£o
+  // reset padr„o
   Sender.Canvas.Font.Style := [];
 
   if cdsSelected in State then
@@ -589,7 +633,7 @@ begin
     Sender.Canvas.Font.Color := TColor($00501830); // texto escuro
 
     if not Assigned(Node.Parent) then
-      Sender.Canvas.Font.Style := [fsBold]; // mant√©m negrito no grupo
+      Sender.Canvas.Font.Style := [fsBold]; // mantÈm negrito no grupo
   end
   else if cdsHot in State then
   begin
@@ -616,7 +660,7 @@ end;
 
 // =============================================================================
 
-{$REGION 'Relat√≥rio ‚Äî Venda por Data'}
+{$REGION 'RelatÛrio ó Venda por Data'}
 
 procedure TfrmPrincipal.VendaporDataClick(Sender: TObject);
 begin
@@ -635,7 +679,7 @@ begin
       frmRelVendaPorData.Relatorio.PreviewModal;
     end
     else
-      MessageDlg('Usu√°rio: ' + oUsuarioLogado.nome + ', n√£o tem permiss√£o de acesso', mtWarning, [mbOK], 0);
+      MessageDlg('Usu·rio: ' + oUsuarioLogado.nome + ', n„o tem permiss„o de acesso', mtWarning, [mbOK], 0);
 
   finally
     if Assigned(frmSelecionarData) then
@@ -649,7 +693,7 @@ end;
 
 // =============================================================================
 
-{$REGION 'Clientes ‚Äî atualiza√ß√£o de status'}
+{$REGION 'Clientes ó atualizaÁ„o de status'}
 
 procedure TfrmPrincipal.AtualizarStatusCliente;
 var
@@ -679,3 +723,4 @@ end;
 {$ENDREGION}
 
 end.
+
