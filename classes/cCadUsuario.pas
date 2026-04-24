@@ -54,7 +54,7 @@ function TUsuario.Apagar: Boolean;
 var Qry:TFDQuery;
 begin
   if MessageDlg('Apagar o Registro: '+#13+#13+
-                'CÛdigo: '+IntToStr(F_usuarioId)+#13+
+                'C√≥digo: '+IntToStr(F_usuarioId)+#13+
                 'Nome: '  +F_nome,mtConfirmation,[mbYes, mbNo],0)=mrNo then begin
      Result:=false;
      abort;
@@ -66,6 +66,8 @@ begin
   try
     Qry.Connection:=ConexaoDB;
     Qry.SQL.Clear;
+    Qry.SQL.Add('DELET FROM usuariosAcaoAcesso WHERE usuarioId = :usuarioId');
+    Qry.ParamByName('usuarioId').AsInteger :=F_usuarioId;
     Qry.SQL.Add('DELETE FROM usuarios '+
                 ' WHERE usuarioId=:usuarioId ');
     Qry.ParamByName('usuarioId').AsInteger :=F_usuarioId;
@@ -141,7 +143,7 @@ begin
                 '                      :senha, '+
                 '                      :senhaSalt )' );
     if not F_AlterouSenha then
-      raise Exception.Create('Senha n„o informada.');
+      raise Exception.Create('Senha n√£o informada.');
 
     Qry.ParamByName('nome').AsString             :=Self.F_nome;
     Qry.ParamByName('senha').AsString            :=Self.F_senha;
@@ -248,7 +250,7 @@ begin
      Qry.ParamByName('senhaSalt').AsString           := F_salt;
 
      if not F_AlterouSenha then
-      raise Exception.Create('Senha inv·lida.');
+      raise Exception.Create('Senha inv√°lida.');
 
       Try
       ConexaoDB.StartTransaction;
@@ -279,7 +281,7 @@ begin
   try
     Qry.Connection := ConexaoDB;
 
-    //busca usu·rio
+    //busca usu√°rio
     Qry.SQL.Clear;
     Qry.SQL.Add('Select usuarioId, nome, senha, senhaSalt '+
                 'FROM usuarios where nome = :nome');
