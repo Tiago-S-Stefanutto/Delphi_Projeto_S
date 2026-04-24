@@ -44,9 +44,8 @@ begin
   try
     oUsuario:=TUsuario.Create(dtmPrincipal.ConexaoDB);
       if oUsuario.Logar(edtUsuario.Text,edtSenha.Text) then begin
-      oUsuarioLogado.codigo:=oUsuario.codigo;
-      oUsuarioLogado.nome:=oUsuario.nome;
-      oUsuarioLogado.senha:=oUsuario.senha;
+      oUsuarioLogado.codigo := oUsuario.codigo;
+      oUsuarioLogado.nome   := oUsuario.nome;;
       bFechar:=true;
        try
         Log := TLog.Create(dtmPrincipal.ConexaoDB);

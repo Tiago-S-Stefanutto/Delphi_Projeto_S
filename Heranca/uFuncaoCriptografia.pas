@@ -3,64 +3,21 @@ unit uFuncaoCriptografia;
 interface
 
 uses Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
-  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, uTelaHeranca, Data.DB, FireDAC.Stan.Intf, FireDAC.Stan.Option, FireDAC.Stan.Param,
-  FireDAC.Stan.Error, FireDAC.DatS, FireDAC.Phys.Intf, FireDAC.DApt.Intf, FireDAC.Stan.Async, FireDAC.DApt,
-  FireDAC.Comp.DataSet, FireDAC.Comp.Client, Vcl.DBCtrls, Vcl.ExtCtrls, Vcl.Grids, Vcl.DBGrids, Vcl.StdCtrls, Vcl.Buttons,
-  Vcl.Mask, Vcl.ComCtrls, RxToolEdit, uEnum, System.UITypes, uDTMConexao;
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, uEnum, System.UITypes, uDTMConexao, System.Hash;
 
-function  Criptografar (const aEntrada:string): string;
-
-function  Descriptografar(const aEntrada:string) : string;
+function GerarSalt: string;
+function GerarHash(const Senha, Salt: string): string;
 
 implementation
 
-{$REGION 'Criptografar'}
-
-function  Criptografar (const aEntrada:string): string;
-var i, iQtdeEnt, iIntervalo:Integer;
-    sSaida:string;
-    sProximoCaracter :string;
+function GerarSalt: string;
 begin
-  iIntervalo:= 6;
-  i         := 0;
-  iQtdeEnt  := 0;
-
-  if (aEntrada <> EmptyStr) then begin
-    iQtdeEnt      := Length (aEntrada);
-    for i   := iQtdeEnt downto  1 do //Faz Loop contrário
-    begin
-      sProximoCaracter  :=Copy(aEntrada, i, 1);
-      sSaida  := sSaida + (Char(ord(sProximoCaracter[1])+iIntervalo));
-    end;
-  end;
-
-  Result := sSaida;
+  Result := Copy(THashSHA2.GetHashString(GuidToString(TGUID.NewGuid)), 1, 16);
 end;
 
-
-{$ENDREGION}
-
-{$REGION 'Descriptografar'}
-function  Descriptografar(const aEntrada:string) : string;
-var i, iQtdeEnt, iIntervalo:Integer;
-    sSaida: string;
-    sProximoCaracter :string;
+function GerarHash(const Senha, Salt: string): string;
 begin
-  iIntervalo:= 6;
-  i         := 0;
-  iQtdeEnt  := 0;
-
-  if (aEntrada <> EmptyStr) then begin
-    iQtdeEnt      := Length (aEntrada);
-    for i   := iQtdeEnt downto  1 do //Faz Loop contrário
-    begin
-      sProximoCaracter  :=Copy(aEntrada, i, 1);
-      sSaida  := sSaida + (Char(ord(sProximoCaracter[1])-iIntervalo));
-    end;
-  end;
-
-  Result := sSaida;
+  Result := THashSHA2.GetHashString(Salt + Senha);
 end;
-{$ENDREGION}
 
 end.

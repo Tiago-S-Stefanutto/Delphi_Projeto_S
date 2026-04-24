@@ -14,8 +14,9 @@ type
     F_usuarioId:Integer;
     F_nome:String;
     F_senha: string;
-    function getSenha: String;
-    procedure setSenha(const Value: String);
+    F_salt: string;
+    F_AlterouSenha: Boolean;
+    procedure SetSenha(const Value: string);
 
   public
     constructor Create(aConexao:TFDConnection);
@@ -28,9 +29,9 @@ type
     function UsuarioExiste(aUsuario: String): Boolean;
     function AlterarSenha: Boolean;
   published
+    property senha: string write SetSenha;
     property codigo        :Integer    read F_usuarioId      write F_usuarioId;
     property nome          :string     read F_nome           write F_nome;
-    property senha         :string     read getSenha         write setSenha;
   end;
 
 implementation
@@ -86,21 +87,36 @@ begin
     Result:=true;
     Qry:=TFDQuery.Create(nil);
   try
-    Qry.Connection:=ConexaoDB;
+    Qry.Connection := ConexaoDB;
     Qry.SQL.Clear;
-    Qry.SQL.Add('UPDATE usuarios '+
-                '   SET nome           =:nome '+
-                '       ,senha         =:senha '+
-                ' WHERE usuarioId=:usuarioId ');
-    Qry.ParamByName('usuarioId').AsInteger       :=Self.F_usuarioId;
-    Qry.ParamByName('nome').AsString             :=Self.F_nome;
-    Qry.ParamByName('senha').AsString            :=Self.F_Senha;
+    Qry.SQL.Add('UPDATE usuarios SET nome = :nome');
+
+    if F_AlterouSenha then
+    begin
+      Qry.SQL.Add(', senha = :senha');
+      Qry.SQL.Add(', senhaSalt = :senhaSalt');
+    end;
+
+    Qry.SQL.Add(' WHERE usuarioId = :usuarioId');
+
+    Qry.ParamByName('usuarioId').AsInteger := F_usuarioId;
+    Qry.ParamByName('nome').AsString := F_nome;
+
+    if F_AlterouSenha then
+    begin
+      Qry.ParamByName('senha').AsString := F_senha;
+      Qry.ParamByName('senhaSalt').AsString := F_salt;
+    end;
 
      try
       Qry.ExecSQL;
     except
       raise;
     end;
+
+    F_senha := '';
+    F_salt := '';
+    F_AlterouSenha := False;
 
   finally
     if Assigned(Qry) then
@@ -111,19 +127,26 @@ end;
 function TUsuario.Inserir: Boolean;
 var Qry:TFDQuery;
 begin
-    Result:=true;
-    Qry:=TFDQuery.Create(nil);
+  Result:=true;
+
+  Qry:=TFDQuery.Create(nil);
   try
     Qry.Connection:=ConexaoDB;
     Qry.SQL.Clear;
     Qry.SQL.Add('INSERT INTO usuarios (nome, '+
-                '                      senha )'+
+                '                      senha, '+
+                '                      senhaSalt ) '+
                 'OUTPUT INSERTED.usuarioId ' +
                 ' VALUES              (:nome, '+
-                '                      :senha )' );
+                '                      :senha, '+
+                '                      :senhaSalt )' );
+    if not F_AlterouSenha then
+      raise Exception.Create('Senha não informada.');
 
     Qry.ParamByName('nome').AsString             :=Self.F_nome;
     Qry.ParamByName('senha').AsString            :=Self.F_senha;
+    Qry.ParamByName('senhaSalt').AsString        := F_salt;
+
 
      try
       Qry.Open;
@@ -131,6 +154,10 @@ begin
     except
       raise;
     end;
+
+    F_senha := '';
+    F_salt := '';
+    F_AlterouSenha := False;
 
   finally
     if Assigned(Qry) then
@@ -148,7 +175,8 @@ begin
     Qry.SQL.Clear;
     Qry.SQL.Add('SELECT usuarioId,'+
                 '       nome, '+
-                '       senha '+
+                '       senha, '+
+                '       senhaSalt '+
                 '  FROM usuarios '+
                 ' WHERE usuarioId=:usuarioId');
     Qry.ParamByName('usuarioId').AsInteger:=id;
@@ -157,7 +185,9 @@ begin
 
       Self.F_usuarioId     := Qry.FieldByName('usuarioId').AsInteger;
       Self.F_nome          := Qry.FieldByName('nome').AsString;
-      Self.F_Senha         := Qry.FieldByName('senha').AsString;;
+      F_senha := '';
+      F_salt := '';
+      F_AlterouSenha := False;
     Except
       Result:=false;
     End;
@@ -199,20 +229,6 @@ end;
 
 {$ENDREGION}
 
-{$REGION 'Get e Set'}
-
-function TUsuario.getSenha: String;
-begin
-  Result := Descriptografar(Self.F_senha);
-end;
-
-procedure TUsuario.setSenha(const Value: String);
-begin
-  Self.F_senha := Criptografar(Value);
-end;
-
-{$ENDREGION}
-
 {$REGION 'Alterar a senha'}
 
 function TUsuario.AlterarSenha: Boolean;
@@ -224,10 +240,15 @@ begin
      Qry.Connection:=ConexaoDB;
      Qry.SQL.Clear;
      Qry.SQL.Add('UPDATE usuarios '+
-                 '   SET senha =:senha '+
+                 '   SET senha =:senha, '+
+                 '       senhaSalt =:senhaSalt '+
                  ' WHERE usuarioId=:usuarioId ');
      Qry.ParamByName('usuarioId').AsInteger     :=Self.F_usuarioId;
-     Qry.ParamByName('senha').AsString          :=Self.F_senha;
+     Qry.ParamByName('senha').AsString          := F_senha;
+     Qry.ParamByName('senhaSalt').AsString           := F_salt;
+
+     if not F_AlterouSenha then
+      raise Exception.Create('Senha inválida.');
 
       Try
       ConexaoDB.StartTransaction;
@@ -250,40 +271,51 @@ end;
 
 function TUsuario.Logar(aUsuario, aSenha: String): Boolean;
 var Qry:TFDQuery;
+HashDigitado: string;
 begin
+  Result  := False;
 
+  Qry := TFDQuery.Create(nil);
   try
-    Qry:=TFDQuery.Create(nil);
-    Qry.Connection:=ConexaoDB;
+    Qry.Connection := ConexaoDB;
+
+    //busca usuário
     Qry.SQL.Clear;
-    Qry.SQL.Add('SELECT usuarioId, '+
-                '      nome, '+
-                '      senha '+
-                '   FROM usuarios '+
-                ' WHERE nome=:nome AND senha=:Senha');
-    Qry.ParamByName('nome').AsString  :=aUsuario;
-    Qry.ParamByName('Senha').AsString :=Criptografar(aSenha);
-    try
-      Qry.Open;
+    Qry.SQL.Add('Select usuarioId, nome, senha, senhaSalt '+
+                'FROM usuarios where nome = :nome');
 
-      if Qry.FieldByName('usuarioId').AsInteger >0 then begin
-        Result:=True;
-        F_usuarioId:= Qry.FieldByName('usuarioId').AsInteger;
-        F_nome:= Qry.FieldByName('nome').AsString;
-        F_senha:= Qry.FieldByName('senha').AsString;
-      end
-      else
-        Result:=False;
+    Qry.ParamByName('nome').AsString  := aUsuario;
+    Qry.Open;
 
-    except
-      Result:=False;
+    if not Qry.IsEmpty then
+    begin
+      //gera hash com salt
+      HashDigitado := GerarHash(aSenha, Qry.FieldByName('senhaSalt').AsString);
+
+      // compara
+      if HashDigitado = Qry.FieldByName('senha').AsString then
+      begin
+        F_usuarioId := Qry.FieldByName('usuarioId').AsInteger;
+        F_nome := Qry.FieldByName('nome').AsString;
+        Result := True;
+      end;
     end;
+
+    F_AlterouSenha := False;
+
   finally
     if Assigned (Qry) then
       FreeAndNil(Qry);
   end;
-
 end;
 
 {$ENDREGION}
+
+procedure TUsuario.SetSenha(const Value: string);
+begin
+  F_salt := GerarSalt;
+  F_senha := GerarHash(Value, F_salt);
+  F_AlterouSenha := True;
+end;
+
 end.

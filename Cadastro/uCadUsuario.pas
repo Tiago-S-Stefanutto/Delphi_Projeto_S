@@ -56,7 +56,7 @@ begin
   if oUsuario.Selecionar(QryListagem.FieldByName('usuarioID').AsInteger) then begin
      edtUsuarioId.Text:=IntToStr(oUsuario.codigo);
      edtNome.Text     :=oUsuario.nome;
-     edtSenha.Text    :=oUsuario.senha;
+     edtSenha.Text := '';
   end
   else begin
     btnCancelar.Click;
@@ -80,8 +80,10 @@ begin
   else
      oUsuario.codigo:=0;
 
-  oUsuario.nome :=edtNome.Text;
-  oUsuario.senha:=edtSenha.Text;
+  oUsuario.nome := edtNome.Text;
+
+  if Trim(edtSenha.Text) <> '' then
+    oUsuario.senha := edtSenha.Text;
 
   inherited;
 end;

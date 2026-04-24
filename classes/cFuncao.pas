@@ -135,9 +135,6 @@ class procedure TFuncao.CriarForm(aNomeForm: TFormClass; oUsuarioLogado: TUsuari
 var form: TForm;
 begin
 
-  if (oUsuarioLogado.codigo <= 0) or (oUsuarioLogado.nome=EmptyStr) or (oUsuarioLogado.senha=EmptyStr) then
-    exit;
-
   try
     form := aNomeForm.Create(Application);
     if TUsuarioLogado.TenhoAcesso(oUsuarioLogado.codigo, form.Name, dtmPrincipal.ConexaoDB) then

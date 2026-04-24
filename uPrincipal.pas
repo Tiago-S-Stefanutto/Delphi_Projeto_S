@@ -506,7 +506,7 @@ begin
   try
         Log := TLog.Create(dtmPrincipal.ConexaoDB);
 
-        Log.usuarioId      := oUsuarioLogado.codigo;
+        Log.  usuarioId      := oUsuarioLogado.codigo;
         Log.usuarioNome    := oUsuarioLogado.nome;
 
         Log.tela           := 'uPrincipal';

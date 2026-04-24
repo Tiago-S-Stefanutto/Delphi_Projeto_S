@@ -178,7 +178,8 @@ begin
       'CREATE TABLE usuarios ( '+
       '	 usuarioId int identity(1,1) not null, '+
       '	 nome varchar(50) not null, '+
-      '	 senha varchar(40) not null, '+
+      '	 senha varchar(64) not null, '+
+      '  senhaSalt varchar(64) not null, '+
       '	 PRIMARY KEY (usuarioId) '+
       '	) '
     );
@@ -264,6 +265,7 @@ begin
     ' pessoaTipoId int NOT NULL DEFAULT 1, '+
     ' grupoClienteId int NULL, '+
     ' segmentoClienteId int NULL, '+
+    ' regiaoClienteId int NULL, '+
     ' primeiroContatoClienteId int NULL, '+
     ' PRIMARY KEY (clienteId), '+
     ' CONSTRAINT FK_Clientes_Status '+

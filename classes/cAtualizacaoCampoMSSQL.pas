@@ -40,7 +40,7 @@ begin
     Qry.SQL.Add(' WHERE LOWER(TABLE_NAME) = :Tabela  ');
     Qry.SQL.Add('  AND LOWER(COLUMN_NAME) = :Campo  ');
     Qry.ParamByName('Tabela').AsString := LowerCase(aNomeTabela);
-Qry.ParamByName('Campo').AsString := LowerCase(aCampo);
+    Qry.ParamByName('Campo').AsString := LowerCase(aCampo);
     Qry.Open;
 
     if Qry.FieldByName('Qtde').AsInteger>0 then
@@ -69,6 +69,11 @@ begin
   begin
     ExecutaDiretoBancoDeDados('alter table clientes add cpf varchar(11) ');
   end;
+
+  if not CampoExisteNaTabela('usuarios','senhaSalt') then
+  ExecutaDiretoBancoDeDados('alter table usuarios add senhaSalt varchar(64)');
+
+
 
   // 1. CAMPO
   if not CampoExisteNaTabela('produtos','tipoEstoqueProdutoId') then
