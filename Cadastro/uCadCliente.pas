@@ -11,7 +11,7 @@ uses
   Vcl.DBGrids, Vcl.StdCtrls, Vcl.Buttons, Vcl.Mask, Vcl.ComCtrls, uEnum, cCadCliente,
   uDTMConexao, RxToolEdit, System.ImageList, Vcl.ImgList, IdHTTP, System.JSON,
   IdSSL, IdSSLOpenSSL, System.Net.HttpClient, System.Net.URLClient,
-  System.Net.HttpClientComponent, uObservacaoClientes;
+  System.Net.HttpClientComponent, uObservacaoClientes, System.RegularExpressions;
 
 type
   //Campos visuais
@@ -89,16 +89,18 @@ type
     QryListagemdataNascimento: TSQLTimeStampField;
     QryListagemclienteStatusId: TIntegerField;
     QryListagempessoaTipoId: TIntegerField;
-    QryListagemgrupoClienteId: TIntegerField;
-    QryListagemsegmentoClienteId: TIntegerField;
-    QryListagemprimeiroContatoClienteId: TIntegerField;
     lkpRegiaoCliente: TDBLookupComboBox;
     Label10: TLabel;
     QryRegiaoCliente: TFDQuery;
     dtsRegiaoCliente: TDataSource;
-    QryListagemregiaoClienteId: TIntegerField;
     QryRegiaoClienteregiaoClienteId: TFDAutoIncField;
     QryRegiaoClientedescricao: TStringField;
+    edtNumeroCasa: TLabeledEdit;
+    QryListagemnumeroCasa: TStringField;
+    QryListagemgrupoDescricao: TStringField;
+    QryListagemsegmentoDescricao: TStringField;
+    QryListagemprimeiroContatoDescricao: TStringField;
+    QryListagemregiaoDescricao: TStringField;
     procedure btnAlterarClick(Sender: TObject);
     procedure btnNovoClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
@@ -158,15 +160,38 @@ begin
 
   if oCliente.Selecionar(QryListagem.FieldByName('clienteId').AsInteger) then begin
      edtClienteId.Text:=IntToStr(oCliente.codigo);
-     edtNome.Text          :=oCliente.nome;
-     edtCEP.Text           :=oCliente.cep;
-     edtEndereco.Text      :=oCliente.endereco;
-     edtBairro.Text        :=oCliente.bairro;
-     edtCidade.Text        :=oCliente.cidade;
-     edtTelefone.Text      :=oCliente.telefone;
-     edtEmail.Text         :=oCliente.email;
-     edtDataNascimento.Date:=oCliente.dataNascimento;
-     edtEstado.Text        :=oCliente.estado;
+     edtNome.Text                       :=oCliente.nome;
+     edtCEP.Text                        :=oCliente.cep;
+     edtEndereco.Text                   :=oCliente.endereco;
+     edtBairro.Text                     :=oCliente.bairro;
+     edtCidade.Text                     :=oCliente.cidade;
+     edtTelefone.Text                   :=oCliente.telefone;
+     edtEmail.Text                      :=oCliente.email;
+     edtDataNascimento.Date             :=oCliente.dataNascimento;
+     edtEstado.Text                     :=oCliente.estado;
+     edtNumeroCasa.Text                 :=oCliente.Casa;
+
+    QryGrupoCliente.Close;
+    QryGrupoCliente.ParamByName('grupoClienteId').AsInteger := oCliente.grupo;
+    QryGrupoCliente.Open;
+
+    QrySegmentoCliente.Close;
+    QrySegmentoCliente.ParamByName('segmentoClienteId').AsInteger := oCliente.segmento;
+    QrySegmentoCliente.Open;
+
+    QryPrimeiroContato.Close;
+    QryPrimeiroContato.ParamByName('primeiroContatoClienteId').AsInteger := oCliente.primeiroContato;
+    QryPrimeiroContato.Open;
+
+    QryRegiaoCliente.Close;
+    QryRegiaoCliente.ParamByName('regiaoClienteId').AsInteger := oCliente.regiao;
+    QryRegiaoCliente.Open;
+
+    lkpGrupoCliente.KeyValue           := oCliente.grupo;
+    lkpRegiaoCliente.KeyValue          := oCliente.regiao;
+    lkpSegmentoCliente.KeyValue        := oCliente.segmento;
+    lkpPrimeiroContatoCliente.KeyValue := oCliente.primeiroContato;
+
      AtualizarTipoDocumento;
      if lcbTipoPessoa.KeyValue = 1 then
      begin
@@ -211,6 +236,31 @@ begin
   inherited;
 
 end;
+
+{$REGION 'Email Validação'}
+function EmailValido(const AEmail: string): Boolean;
+const
+  REGEX_EMAIL =
+    '^(?!\.)' +                    // não começa com ponto
+    '(?!.*\.\.)' +                 // não permite dois pontos seguidos
+    '[A-Za-z0-9._%+-]+' +          // parte local
+    '@' +
+    '[A-Za-z0-9.-]+' +             // domínio
+    '\.[A-Za-z]{2,}$';             // extensão (.com, .com.br, etc)
+var
+  Email: string;
+begin
+  Result := False;
+  Email := Trim(AEmail);
+
+  // regras básicas antes do regex
+  if Email = '' then Exit;
+  if Pos('@', Email) = 0 then Exit;
+  if Length(Email) > 254 then Exit; // padrão RFC
+
+  Result := TRegEx.IsMatch(Email, REGEX_EMAIL);
+end;
+{$ENDREGION}
 
 {$REGION 'Verificação dos documentos}
 
@@ -345,7 +395,12 @@ procedure TTfrmCadCliente.btnGravarClick(Sender: TObject);
 begin
 
   ValidarDocumento;
-
+  if not EmailValido(edtEmail.Text) then
+  begin
+    ShowMessage('Email inválido!');
+    edtEmail.SetFocus;
+    Exit;
+  end;
   inherited;
 
 end;
@@ -359,15 +414,20 @@ begin
      oCliente.codigo:=0;
 
   //pega os dados da tela
-  oCliente.nome           :=edtNome.Text;
-  oCliente.cep            :=edtCEP.Text;
-  oCliente.endereco       :=edtEndereco.Text;
-  oCliente.bairro         :=edtBairro.Text;
-  oCliente.cidade         :=edtCidade.Text;
-  oCliente.telefone       :=edtTelefone.Text;
-  oCliente.email          :=edtEmail.Text;
-  oCliente.dataNascimento :=edtDataNascimento.Date;
-  oCliente.estado         :=edtEstado.Text;
+  oCliente.nome            :=edtNome.Text;
+  oCliente.cep             :=edtCEP.Text;
+  oCliente.endereco        :=edtEndereco.Text;
+  oCliente.bairro          :=edtBairro.Text;
+  oCliente.cidade          :=edtCidade.Text;
+  oCliente.telefone        :=edtTelefone.Text;
+  oCliente.email           :=edtEmail.Text;
+  oCliente.dataNascimento  :=edtDataNascimento.Date;
+  oCliente.estado          :=edtEstado.Text;
+  oCliente.Casa            :=edtNumeroCasa.Text;
+  oCliente.grupo           :=lkpGrupoCliente.KeyValue;
+  oCliente.regiao          :=lkpRegiaoCliente.KeyValue;
+  oCliente.segmento        :=lkpSegmentoCliente.KeyValue;
+  oCliente.primeiroContato :=lkpPrimeiroContatoCliente.KeyValue;
 
   if lcbTipoPessoa.KeyValue = 1 then
   begin
@@ -566,6 +626,23 @@ end;
 procedure TTfrmCadCliente.btnNovoClick(Sender: TObject);
 begin
   inherited;
+
+  QryGrupoCliente.Close;
+  QryGrupoCliente.ParamByName('grupoClienteId').AsInteger := -1;
+  QryGrupoCliente.Open;
+
+  QrySegmentoCliente.Close;
+  QrySegmentoCliente.ParamByName('segmentoClienteId').AsInteger := -1;
+  QrySegmentoCliente.Open;
+
+  QryPrimeiroContato.Close;
+  QryPrimeiroContato.ParamByName('primeiroContatoClienteId').AsInteger := -1;
+  QryPrimeiroContato.Open;
+
+  QryRegiaoCliente.Close;
+  QryRegiaoCliente.ParamByName('regiaoClienteId').AsInteger := -1;
+  QryRegiaoCliente.Open;
+
   lcbTipoPessoa.KeyValue := Null;
   lblCpfCnpj.Caption := 'CPF/CNPJ';
   edtDataNascimento.Date:=Date;
@@ -760,9 +837,13 @@ begin
   inherited;
   QryStatus.Open;
   QryTipoPessoa.Open;
+
   QryGrupoCliente.Open;
+
   QrySegmentoCliente.Open;
+
   QryPrimeiroContato.Open;
+
   QryRegiaoCliente.Open;
 
 end;

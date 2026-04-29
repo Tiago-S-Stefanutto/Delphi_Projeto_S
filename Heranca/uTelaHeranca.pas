@@ -1,4 +1,4 @@
-unit uTelaHeranca;
+Ôªøunit uTelaHeranca;
 
 interface
 
@@ -7,7 +7,8 @@ uses
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Data.DB, Vcl.DBCtrls, Vcl.Grids, Vcl.DBGrids, Vcl.StdCtrls, Vcl.Buttons, Vcl.Mask,
   Vcl.ComCtrls, Vcl.ExtCtrls, uDTMConexao, FireDAC.Stan.Intf,
   FireDAC.Stan.Option, FireDAC.Stan.Param, FireDAC.Stan.Error, FireDAC.DatS, FireDAC.Phys.Intf, FireDAC.DApt.Intf,
-  FireDAC.Stan.Async, FireDAC.DApt, FireDAC.Comp.DataSet, FireDAC.Comp.Client, uEnum, cUsuarioLogado, IniFiles, cLog;
+  FireDAC.Stan.Async, FireDAC.DApt, FireDAC.Comp.DataSet, FireDAC.Comp.Client, uEnum, cUsuarioLogado, IniFiles, cLog,
+  ComObj;
 
   function SomenteNumeros(const Texto: string): string;
 
@@ -83,12 +84,12 @@ uses uPrincipal;
 {$R *.dfm}
 
 //Procedimento de controle de tela
-{$REGION 'ObservaÁıes'}
-//Tag: 1 - Chave Prim·ria - pk
-//Tag: 2 - Campo ObrigatÛrios
+{$REGION 'Observa√ß√µes'}
+//Tag: 1 - Chave Prim√°ria - pk
+//Tag: 2 - Campo Obrigat√≥rios
  {$ENDREGION}
 
-{$REGION 'FunÁıes e Procedures'}
+{$REGION 'Fun√ß√µes e Procedures'}
 
 procedure TfrmTelaHeranca.ControlarBotoes(btnNovo, btnAlterar, btnCancelar, btnGravar, btnApagar:TBitBtn; btnNavigator:TDBNavigator; pgcPrincipal:TPageControl; Flag:Boolean);
 begin
@@ -134,7 +135,7 @@ begin
   for i := 0 to ComponentCount -1 do begin
     if (Components[i] is TLabeledEdit) then begin
         if ((TLabeledEdit(Components[i]).Tag = 2) and (TLabeledEdit(Components[i]).Text = EmptyStr)) then begin
-         MessageDlg(TLabeledEdit(Components[i]).EditLabel.Caption + ' È um campo obrigatÛrio',mtInformation,[mbOK],0);
+         MessageDlg(TLabeledEdit(Components[i]).EditLabel.Caption + ' √© um campo obrigat√≥rio',mtInformation,[mbOK],0);
          TLabeledEdit(Components[i]).SetFocus;
 
          Result := True;
@@ -183,7 +184,7 @@ end;
 
 {$ENDREGION}
 
-{$REGION 'MÈtodos Virtuais'}
+{$REGION 'M√©todos Virtuais'}
 function TfrmTelaHeranca.Apagar: Boolean;
 begin
   ShowMessage('Deletado');
@@ -206,7 +207,7 @@ begin
 
   if not TUsuarioLogado.TenhoAcesso(oUsuarioLogado.codigo, self.Name+'_'+TBitBtn(Sender).Name, DtmPrincipal.ConexaoDB) then
   begin
-     MessageDlg('Usu·rio: '+oUsuarioLogado.nome +', n„o tem permiss„o de acesso',mtWarning,[mbOK],0);
+     MessageDlg('Usu√°rio: '+oUsuarioLogado.nome +', n√£o tem permiss√£o de acesso',mtWarning,[mbOK],0);
      Abort;
   end;
 
@@ -220,7 +221,7 @@ begin
 
   if not TUsuarioLogado.TenhoAcesso(oUsuarioLogado.codigo, self.Name+'_'+TBitBtn(Sender).Name, DtmPrincipal.ConexaoDB) then
   begin
-     MessageDlg('Usu·rio: '+oUsuarioLogado.nome +', n„o tem permiss„o de acesso',mtWarning,[mbOK],0);
+     MessageDlg('Usu√°rio: '+oUsuarioLogado.nome +', n√£o tem permiss√£o de acesso',mtWarning,[mbOK],0);
      Abort;
   end;
 
@@ -234,7 +235,7 @@ begin
 
   if not TUsuarioLogado.TenhoAcesso(oUsuarioLogado.codigo, self.Name+'_'+TBitBtn(Sender).Name, DtmPrincipal.ConexaoDB) then
   begin
-     MessageDlg('Usu·rio: '+oUsuarioLogado.nome +', n„o tem permiss„o de acesso',mtWarning,[mbOK],0);
+     MessageDlg('Usu√°rio: '+oUsuarioLogado.nome +', n√£o tem permiss√£o de acesso',mtWarning,[mbOK],0);
      Abort;
   end;
 
@@ -244,7 +245,7 @@ begin
   try
     if not (Apagar)  then begin
       dtmPrincipal.ConexaoDB.Rollback;
-      MessageDlg('Erro na Exclus„o', mtWarning, [mbOK], 0);
+      MessageDlg('Erro na Exclus√£o', mtWarning, [mbOK], 0);
       Exit;
     end;
 
@@ -253,7 +254,7 @@ begin
       Log.usuarioId      := oUsuarioLogado.codigo;
       Log.usuarioNome    := oUsuarioLogado.nome;
       Log.tela           := Self.Name;
-      Log.acao           := 'Exclus„o';
+      Log.acao           := 'Exclus√£o';
 
       Log.descricao := ('Na tela ' + Self.Name + ' houve um(a) ' + Log.acao + ' no item de Id: ' + vId +  ' e nome: ' + vNome);
 
@@ -302,11 +303,11 @@ begin
   if EstadoDoCadastro = ecInserir then
     AcaoLog := 'Inserir'
   else
-    AcaoLog := 'AtualizaÁ„o';
+    AcaoLog := 'Atualiza√ß√£o';
 
   if not TUsuarioLogado.TenhoAcesso(oUsuarioLogado.codigo, self.Name+'_'+TBitBtn(Sender).Name, DtmPrincipal.ConexaoDB) then
   begin
-     MessageDlg('Usu·rio: '+oUsuarioLogado.nome +', n„o tem permiss„o de acesso',mtWarning,[mbOK],0);
+     MessageDlg('Usu√°rio: '+oUsuarioLogado.nome +', n√£o tem permiss√£o de acesso',mtWarning,[mbOK],0);
      Abort;
   end;
 
@@ -320,7 +321,7 @@ begin
     if not Gravar(EstadoDoCadastro) then
     begin
       dtmPrincipal.ConexaoDB.Rollback;
-      MessageDlg('Erro na gravaÁ„o', mtWarning, [mbOK], 0);
+      MessageDlg('Erro na grava√ß√£o', mtWarning, [mbOK], 0);
       Exit;
     end;
 
@@ -373,7 +374,7 @@ begin
   dtsListagem.DataSet    := QryListagem;
   grdListagem.DataSource := dtsListagem;
   grdListagem.Options    := [dgTitles, dgIndicator, dgColumnResize, dgColLines,
-                             dgRowLines, dgTabs, dgRowSelect, dgAlwaysShowSelection,
+                             dgRowLines, dgTabs, dgAlwaysShowSelection,
                              dgCancelOnExit, dgTitleClick, dgTitleHotTrack];
   grdListagem.DefaultDrawing := False;
 
@@ -457,8 +458,8 @@ begin
   if not TUsuarioLogado.TenhoAcesso(oUsuarioLogado.codigo,
      Self.Name + '_' + TBitBtn(Sender).Name, DtmPrincipal.ConexaoDB) then
   begin
-    MessageDlg('Usu·rio: ' + oUsuarioLogado.nome +
-      ', n„o tem permiss„o de acesso', mtWarning, [mbOK], 0);
+    MessageDlg('Usu√°rio: ' + oUsuarioLogado.nome +
+      ', n√£o tem permiss√£o de acesso', mtWarning, [mbOK], 0);
     Abort;
   end;
 
@@ -509,7 +510,7 @@ begin
 
         if not TryStrToInt(Valor, I) then
         begin
-          MessageDlg('Digite um n˙mero v·lido', mtWarning, [mbOK], 0);
+          MessageDlg('Digite um n√∫mero v√°lido', mtWarning, [mbOK], 0);
           Exit;
         end;
 
@@ -556,7 +557,7 @@ begin
     Ini.EraseSection(Secao);
     for i := 0 to grdListagem.Columns.Count - 1 do
     begin
-      // Salva pelo Ìndice VISUAL atual (posiÁ„o que o usu·rio deixou)
+      // Salva pelo √≠ndice VISUAL atual (posi√ß√£o que o usu√°rio deixou)
       Ini.WriteInteger(Secao, 'Col_' + IntToStr(i) + '_Width', grdListagem.Columns[i].Width);
       Ini.WriteInteger(Secao, 'Col_' + IntToStr(i) + '_Order', grdListagem.Columns[i].Index);
       Ini.WriteString(Secao,  'Col_' + IntToStr(i) + '_Field', grdListagem.Columns[i].FieldName);

@@ -85,20 +85,26 @@ object dtmVenda: TdtmVenda
     Left = 232
     Top = 16
     object cdsItensVendaprodutoId: TIntegerField
+      DisplayLabel = 'C'#243'd. Produto'
       FieldName = 'produtoId'
     end
     object cdsItensVendanomeProduto: TStringField
+      DisplayLabel = 'Nome'
       FieldName = 'nomeProduto'
       Size = 100
     end
     object cdsItensVendaquantidade: TFloatField
+      DisplayLabel = 'Quantidade'
       FieldName = 'quantidade'
     end
     object cdsItensVendavalorUnitario: TFloatField
+      DisplayLabel = 'Valor Unit'#225'rio'
       FieldName = 'valorUnitario'
     end
     object cdsItensVendavalorTotalProduto: TFloatField
+      DisplayLabel = 'Valor Total'
       FieldName = 'valorTotalProduto'
+      DisplayFormat = 'R$##,##0.00'
     end
   end
   object dtsCliente: TDataSource

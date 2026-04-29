@@ -9,7 +9,6 @@ inherited frmCadProduto: TfrmCadProduto
   inherited pgcPrincipal: TPageControl
     Width = 752
     Height = 388
-    ActivePage = tabManutencao
     ExplicitWidth = 752
     ExplicitHeight = 388
     inherited TabListagem: TTabSheet
@@ -21,6 +20,7 @@ inherited frmCadProduto: TfrmCadProduto
         Width = 160
         Height = 311
         Align = alRight
+        Center = True
         Proportional = True
         Stretch = True
         Visible = False
@@ -113,6 +113,8 @@ inherited frmCadProduto: TfrmCadProduto
       end
     end
     inherited tabManutencao: TTabSheet
+      ExplicitLeft = 4
+      ExplicitTop = 24
       ExplicitWidth = 744
       ExplicitHeight = 360
       object lblDescricao: TLabel

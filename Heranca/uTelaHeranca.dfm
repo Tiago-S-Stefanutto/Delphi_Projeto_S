@@ -96,6 +96,10 @@ object frmTelaHeranca: TfrmTelaHeranca
     object tabManutencao: TTabSheet
       Caption = 'Manuten'#231#227'o'
       ImageIndex = 1
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
     end
   end
   object pnlRodaPe: TPanel
@@ -298,6 +302,7 @@ object frmTelaHeranca: TfrmTelaHeranca
       Width = 77
       Height = 27
       Anchors = [akTop, akRight]
+      Cancel = True
       Caption = '&Fechar'
       Glyph.Data = {
         36030000424D3603000000000000360000002800000010000000100000000100

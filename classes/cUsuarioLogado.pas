@@ -12,15 +12,17 @@ type
       F_UsuarioId:Integer;
       F_nome:string;
       F_senha:string;
-
+      F_nivelUsuarioId: Integer;
+      F_statusUsuarioId: Integer;
     public
       class function TenhoAcesso (aUsuarioId: Integer; aChave: string; aConexao:TFDConnection): boolean; static;
 
     published
-      property  codigo        :Integer  read F_UsuarioId  write F_UsuarioId;
-      property  nome          :string   read F_nome       write F_nome;
-      property  senha         :string   read F_senha      write F_senha;
-
+      property  codigo        :Integer  read F_UsuarioId        write F_UsuarioId;
+      property  nome          :string   read F_nome             write F_nome;
+      property  senha         :string   read F_senha            write F_senha;
+      property nivelUsuarioId: Integer  read F_nivelUsuarioId   write F_nivelUsuarioId;
+      property statusUsuarioId: Integer read F_statusUsuarioId  write F_statusUsuarioId;
   end;
 
 implementation

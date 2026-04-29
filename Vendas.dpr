@@ -56,7 +56,8 @@ uses
   uCadPrimeiroContatoCliente in 'Cadastro\uCadPrimeiroContatoCliente.pas' {frmCadPrimeiroContato},
   cCadPrimeiroContatoCliente in 'classes\cCadPrimeiroContatoCliente.pas',
   cCadRegiaoCliente in 'classes\cCadRegiaoCliente.pas',
-  uCadRegiaoCliente in 'Cadastro\uCadRegiaoCliente.pas' {frmCadRegiaoCliente};
+  uCadRegiaoCliente in 'Cadastro\uCadRegiaoCliente.pas' {frmCadRegiaoCliente},
+  uCadRegistro in 'Cadastro\uCadRegistro.pas' {frmCadRegistro};
 
 {$R *.res}
 

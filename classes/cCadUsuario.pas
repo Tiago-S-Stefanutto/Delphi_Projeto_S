@@ -5,7 +5,7 @@ uses Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.C
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, uTelaHeranca, Data.DB, FireDAC.Stan.Intf, FireDAC.Stan.Option, FireDAC.Stan.Param,
   FireDAC.Stan.Error, FireDAC.DatS, FireDAC.Phys.Intf, FireDAC.DApt.Intf, FireDAC.Stan.Async, FireDAC.DApt,
   FireDAC.Comp.DataSet, FireDAC.Comp.Client, Vcl.DBCtrls, Vcl.ExtCtrls, Vcl.Grids, Vcl.DBGrids, Vcl.StdCtrls, Vcl.Buttons,
-  Vcl.Mask, Vcl.ComCtrls, RxToolEdit, uEnum, uDTMConexao, uFuncaoCriptografia;
+  Vcl.Mask, Vcl.ComCtrls, RxToolEdit, uEnum, uDTMConexao, uFuncaoCriptografia, cAcaoAcesso;
 
 type
   TUsuario = class
@@ -15,7 +15,9 @@ type
     F_nome:String;
     F_senha: string;
     F_salt: string;
+    F_nivelUsuarioId: Integer;
     F_AlterouSenha: Boolean;
+    F_StatusUsuarioId :integer;
     procedure SetSenha(const Value: string);
 
   public
@@ -26,12 +28,14 @@ type
     function Apagar:Boolean;
     function Selecionar(id:Integer):Boolean;
     function Logar(aUsuario, aSenha: String): Boolean;
-    function UsuarioExiste(aUsuario: String): Boolean;
+    function UsuarioExiste(aUsuario: String; aId: Integer = 0): Boolean;
     function AlterarSenha: Boolean;
   published
     property senha: string write SetSenha;
     property codigo        :Integer    read F_usuarioId      write F_usuarioId;
     property nome          :string     read F_nome           write F_nome;
+    property nivelUsuarioId: Integer read F_nivelUsuarioId write F_nivelUsuarioId;
+    property statusUsuarioId: Integer read F_StatusUsuarioId write F_StatusUsuarioId;
   end;
 
 implementation
@@ -54,7 +58,7 @@ function TUsuario.Apagar: Boolean;
 var Qry:TFDQuery;
 begin
   if MessageDlg('Apagar o Registro: '+#13+#13+
-                'Código: '+IntToStr(F_usuarioId)+#13+
+                'C�digo: '+IntToStr(F_usuarioId)+#13+
                 'Nome: '  +F_nome,mtConfirmation,[mbYes, mbNo],0)=mrNo then begin
      Result:=false;
      abort;
@@ -66,7 +70,7 @@ begin
   try
     Qry.Connection:=ConexaoDB;
     Qry.SQL.Clear;
-    Qry.SQL.Add('DELET FROM usuariosAcaoAcesso WHERE usuarioId = :usuarioId');
+    Qry.SQL.Add('DELETE FROM usuariosAcaoAcesso WHERE usuarioId = :usuarioId');
     Qry.ParamByName('usuarioId').AsInteger :=F_usuarioId;
     Qry.SQL.Add('DELETE FROM usuarios '+
                 ' WHERE usuarioId=:usuarioId ');
@@ -91,7 +95,7 @@ begin
   try
     Qry.Connection := ConexaoDB;
     Qry.SQL.Clear;
-    Qry.SQL.Add('UPDATE usuarios SET nome = :nome');
+    Qry.SQL.Add('UPDATE usuarios SET nome = :nome, nivelUsuarioId = :nivel, statusUsuarioId = :status');
 
     if F_AlterouSenha then
     begin
@@ -103,6 +107,8 @@ begin
 
     Qry.ParamByName('usuarioId').AsInteger := F_usuarioId;
     Qry.ParamByName('nome').AsString := F_nome;
+    Qry.ParamByName('nivel').AsInteger := F_nivelUsuarioId;
+    Qry.ParamByName('status').AsInteger := F_StatusUsuarioId;
 
     if F_AlterouSenha then
     begin
@@ -112,6 +118,7 @@ begin
 
      try
       Qry.ExecSQL;
+      TAcaoAcesso.AtualizarPermissoesUsuario(F_usuarioId, F_nivelUsuarioId, ConexaoDB);
     except
       raise;
     end;
@@ -137,17 +144,23 @@ begin
     Qry.SQL.Clear;
     Qry.SQL.Add('INSERT INTO usuarios (nome, '+
                 '                      senha, '+
-                '                      senhaSalt ) '+
+                '                      senhaSalt, '+
+                '                      nivelUsuarioId, '+
+                '                      statusUsuarioId ) '+
                 'OUTPUT INSERTED.usuarioId ' +
                 ' VALUES              (:nome, '+
                 '                      :senha, '+
-                '                      :senhaSalt )' );
+                '                      :senhaSalt, '+
+                '                      :nivelUsuarioId, '+
+                '                      :statusUsuarioId )' );
     if not F_AlterouSenha then
-      raise Exception.Create('Senha não informada.');
+      raise Exception.Create('Senha n�o informada.');
 
     Qry.ParamByName('nome').AsString             :=Self.F_nome;
     Qry.ParamByName('senha').AsString            :=Self.F_senha;
     Qry.ParamByName('senhaSalt').AsString        := F_salt;
+    Qry.ParamByName('nivelUsuarioId').AsInteger := F_nivelUsuarioId;
+    Qry.ParamByName('statusUsuarioId').AsInteger := F_StatusUsuarioId;
 
 
      try
@@ -178,7 +191,8 @@ begin
     Qry.SQL.Add('SELECT usuarioId,'+
                 '       nome, '+
                 '       senha, '+
-                '       senhaSalt '+
+                '       senhaSalt, '+
+                '       statusUsuarioId '+
                 '  FROM usuarios '+
                 ' WHERE usuarioId=:usuarioId');
     Qry.ParamByName('usuarioId').AsInteger:=id;
@@ -187,6 +201,7 @@ begin
 
       Self.F_usuarioId     := Qry.FieldByName('usuarioId').AsInteger;
       Self.F_nome          := Qry.FieldByName('nome').AsString;
+      F_StatusUsuarioId := Qry.FieldByName('statusUsuarioId').AsInteger;
       F_senha := '';
       F_salt := '';
       F_AlterouSenha := False;
@@ -200,32 +215,32 @@ begin
   end;
 end;
 
-function TUsuario.UsuarioExiste(aUsuario:String):Boolean;
-var Qry:TFDQuery;
+function TUsuario.UsuarioExiste(aUsuario: String; aId: Integer = 0): Boolean;
+var Qry: TFDQuery;
 begin
+  Qry := TFDQuery.Create(nil);
   try
-    Qry:=TFDQuery.Create(nil);
-    Qry.Connection:=ConexaoDB;
+    Qry.Connection := ConexaoDB;
     Qry.SQL.Clear;
-    Qry.SQL.Add('SELECT COUNT(usuarioId) AS Qtde '+
-                '  FROM usuarios '+
-                ' WHERE nome =:nome ');
-    Qry.ParamByName('nome').AsString :=aUsuario;
-    Try
-      Qry.Open;
 
-      if Qry.FieldByName('Qtde').AsInteger>0 then
-         result := true
-      else
-         result := false;
+    Qry.SQL.Add('SELECT COUNT(usuarioId) AS Qtde ');
+    Qry.SQL.Add('FROM usuarios ');
+    Qry.SQL.Add('WHERE nome = :nome ');
 
-    Except
-      Result:=false;
-    End;
+    if aId > 0 then
+      Qry.SQL.Add('AND usuarioId <> :usuarioId');
+
+    Qry.ParamByName('nome').AsString := aUsuario;
+
+    if aId > 0 then
+      Qry.ParamByName('usuarioId').AsInteger := aId;
+
+    Qry.Open;
+
+    Result := Qry.FieldByName('Qtde').AsInteger > 0;
 
   finally
-    if Assigned(Qry) then
-       FreeAndNil(Qry);
+    Qry.Free;
   end;
 end;
 
@@ -250,7 +265,7 @@ begin
      Qry.ParamByName('senhaSalt').AsString           := F_salt;
 
      if not F_AlterouSenha then
-      raise Exception.Create('Senha inválida.');
+      raise Exception.Create('Senha inv lida.');
 
       Try
       ConexaoDB.StartTransaction;
@@ -281,10 +296,10 @@ begin
   try
     Qry.Connection := ConexaoDB;
 
-    //busca usuário
+    //busca usu rio
     Qry.SQL.Clear;
-    Qry.SQL.Add('Select usuarioId, nome, senha, senhaSalt '+
-                'FROM usuarios where nome = :nome');
+    Qry.SQL.Add('Select usuarioId, nome, senha, senhaSalt, statusUsuarioId, nivelUsuarioId '+
+            'FROM usuarios where nome = :nome');
 
     Qry.ParamByName('nome').AsString  := aUsuario;
     Qry.Open;
@@ -299,6 +314,8 @@ begin
       begin
         F_usuarioId := Qry.FieldByName('usuarioId').AsInteger;
         F_nome := Qry.FieldByName('nome').AsString;
+        F_StatusUsuarioId := Qry.FieldByName('statusUsuarioId').AsInteger;
+        F_nivelUsuarioId := Qry.FieldByName('nivelUsuarioId').AsInteger;
         Result := True;
       end;
     end;

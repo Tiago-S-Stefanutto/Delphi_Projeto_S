@@ -17,7 +17,7 @@ type
       F_chave: string;
 
       class procedure PreencherAcoes(aForm: TForm; aConexao:TFDConnection); static;
-      class procedure VerificarUsuarioAcao(aUsuarioId, aAcaoAcessoId: Integer; aConexao: TFDConnection);
+    class procedure VerificarUsuarioAcao(aUsuarioId, aAcaoAcessoId, aNivel: Integer; aConexao: TFDConnection); static;
     public
       constructor Create(aConexao:TFDConnection);
       destructor Destroy; override;
@@ -28,6 +28,7 @@ type
       function ChaveExiste(aChave:String; aId:Integer=0):Boolean;
       class procedure CriarAcoes(aNomeForm: TFormClass; aConexao:TFDConnection); static;
       class procedure PreencherUsuariosVsAcoes(aConexao: TFDConnection); static;
+      class procedure AtualizarPermissoesUsuario(aUsuarioId, aNivel: Integer; aConexao: TFDConnection); static;
     published
         property codigo         :Integer    read F_acaoAcessoId   write F_acaoAcessoId;
         property descricao      :string     read F_descricao      write F_descricao;
@@ -193,6 +194,120 @@ begin
   end;
 end;
 
+function TemAcesso(Nivel: Integer; Chave: string): Boolean;
+begin
+  case Nivel of
+    1: Result := True; // admin
+
+    2: // gerente
+      Result := not (
+        Chave.Contains('frmLogSistema') or
+        Chave.Contains('frmCadUsuario') or
+        Chave.Contains('frmCadAcaoAcesso') or
+        Chave.Contains('frmUsuarioVsAcoes')
+      );
+
+    3: // usuario
+      Result := not (
+        Chave.Contains('frmLogSistema') or
+        Chave.Contains('frmCadUsuario') or
+        Chave.Contains('frmCadAcaoAcesso') or
+        Chave.Contains('frmUsuarioVsAcoes') or
+        Chave.Contains('_btnApagar')
+      );
+  else
+    Result := False;
+  end;
+end;
+
+class procedure TAcaoAcesso.VerificarUsuarioAcao(aUsuarioId, aAcaoAcessoId, aNivel: Integer; aConexao: TFDConnection);
+var
+  Qry: TFDQuery;
+  Chave: string;
+  Ativo: Boolean;
+begin
+  Qry := TFDQuery.Create(nil);
+  try
+    Qry.Connection := aConexao;
+
+    Qry.SQL.Text :=
+      'SELECT 1 FROM usuariosAcaoAcesso '+
+      'WHERE usuarioId = :usuarioId AND acaoAcessoId = :acaoAcessoId';
+
+    Qry.ParamByName('usuarioId').AsInteger := aUsuarioId;
+    Qry.ParamByName('acaoAcessoId').AsInteger := aAcaoAcessoId;
+    Qry.Open;
+
+    if Qry.IsEmpty then
+    begin
+      Qry.Close;
+
+      Qry.SQL.Text := 'SELECT chave FROM acaoAcesso WHERE acaoAcessoId = :id';
+      Qry.ParamByName('id').AsInteger := aAcaoAcessoId;
+      Qry.Open;
+
+      Chave := Qry.FieldByName('chave').AsString;
+      Qry.Close;
+
+      Ativo := TemAcesso(aNivel, Chave);
+
+      Qry.SQL.Text :=
+        'INSERT INTO usuariosAcaoAcesso (usuarioId, acaoAcessoId, ativo) '+
+        'VALUES (:usuarioId, :acaoAcessoId, :ativo)';
+
+      Qry.ParamByName('usuarioId').AsInteger := aUsuarioId;
+      Qry.ParamByName('acaoAcessoId').AsInteger := aAcaoAcessoId;
+      Qry.ParamByName('ativo').AsBoolean := Ativo;
+
+      Qry.ExecSQL;
+    end;
+
+  finally
+    if Assigned(Qry) then
+       FreeAndNil(Qry);
+  end;
+end;
+
+class procedure TAcaoAcesso.AtualizarPermissoesUsuario(aUsuarioId, aNivel: Integer; aConexao: TFDConnection);
+var
+  Qry: TFDQuery;
+begin
+  Qry := TFDQuery.Create(nil);
+  try
+    Qry.Connection := aConexao;
+
+    Qry.SQL.Text := 'DELETE FROM usuariosAcaoAcesso WHERE usuarioId = :usuarioId';
+    Qry.ParamByName('usuarioId').AsInteger := aUsuarioId;
+
+    aConexao.StartTransaction;
+    Qry.ExecSQL;
+
+    Qry.SQL.Text := 'SELECT acaoAcessoId FROM acaoAcesso';
+    Qry.Open;
+
+    while not Qry.Eof do
+    begin
+      VerificarUsuarioAcao(
+        aUsuarioId,
+        Qry.FieldByName('acaoAcessoId').AsInteger,
+        aNivel,
+        aConexao
+      );
+
+      Qry.Next;
+    end;
+
+    aConexao.Commit;
+
+  except
+    aConexao.Rollback;
+    raise;
+  end;
+
+  if Assigned(Qry) then
+       FreeAndNil(Qry);
+end;
+
 class procedure TAcaoAcesso.PreencherAcoes(aForm: TForm; aConexao: TFDConnection);
 var i:Integer;
     oAcaoAcesso:TAcaoAcesso;
@@ -254,44 +369,7 @@ begin
   end;
 end;
 
-class procedure TAcaoAcesso.VerificarUsuarioAcao(aUsuarioId, aAcaoAcessoId: Integer; aConexao: TFDConnection);
-var Qry:TFDQuery;
-begin
-  try
-    Qry:=TFDQuery.Create(nil);
-    Qry.Connection:=aConexao;
-    Qry.SQL.Clear;
-    Qry.SQL.Add('SELECT usuarioId '+
-                '  FROM usuariosAcaoAcesso '+
-                ' WHERE usuarioId=:usuarioId '+
-                '   AND acaoAcessoId=:acaoAcessoId ');
-    Qry.ParamByName('usuarioId').AsInteger:=aUsuarioId;
-    Qry.ParamByName('acaoAcessoId').AsInteger:=aAcaoAcessoId;
-    Qry.Open;
 
-    if Qry.IsEmpty then
-    begin
-       Qry.Close;
-       Qry.SQL.Clear;
-       Qry.SQL.Add('INSERT INTO usuariosAcaoAcesso (usuarioId, acaoAcessoId, ativo) '+
-                   '     VALUES (:usuarioId, :acaoAcessoId, :ativo) ');
-       Qry.ParamByName('usuarioId').AsInteger:=aUsuarioId;
-       Qry.ParamByName('acaoAcessoId').AsInteger:=aAcaoAcessoId;
-       Qry.ParamByName('ativo').AsBoolean:=true;
-       Try
-         aConexao.StartTransaction;
-         Qry.ExecSQL;
-         aConexao.Commit;
-       Except
-         aConexao.Rollback;
-       End;
-    end;
-
-  finally
-    if Assigned(Qry) then
-       FreeAndNil(Qry);
-  end;
-  end;
 
 class procedure TAcaoAcesso.PreencherUsuariosVsAcoes(aConexao: TFDConnection);
 var Qry:TFDQuery;
@@ -306,7 +384,7 @@ begin
     QryAcaoAcesso.Connection:=aConexao;
     QryAcaoAcesso.SQL.Clear;
 
-    Qry.SQL.Add('SELECT usuarioId FROM usuarios ');
+    Qry.SQL.Add('SELECT usuarioId, nivelUsuarioId FROM usuarios ');
     Qry.Open;
 
     QryAcaoAcesso.SQL.Add('SELECT acaoAcessoId FROM acaoAcesso ');
@@ -320,8 +398,9 @@ begin
       while not QryAcaoAcesso.Eof do //AcaoAcesso
       begin
         VerificarUsuarioAcao(Qry.FieldByName('usuarioId').AsInteger,
-                             QryAcaoAcesso.FieldByName('acaoAcessoId').AsInteger,
-                             aConexao);
+                              QryAcaoAcesso.FieldByName('acaoAcessoId').AsInteger,
+                              Qry.FieldByName('nivelUsuarioId').AsInteger,
+                              aConexao );
         QryAcaoAcesso.Next;
       end;
 

@@ -386,22 +386,27 @@ inherited TfrmCadCliente: TTfrmCadCliente
           end
           item
             Expanded = False
-            FieldName = 'grupoClienteId'
+            FieldName = 'numeroCasa'
             Visible = True
           end
           item
             Expanded = False
-            FieldName = 'segmentoClienteId'
+            FieldName = 'grupoDescricao'
             Visible = True
           end
           item
             Expanded = False
-            FieldName = 'primeiroContatoClienteId'
+            FieldName = 'segmentoDescricao'
             Visible = True
           end
           item
             Expanded = False
-            FieldName = 'regiaoClienteId'
+            FieldName = 'primeiroContatoDescricao'
+            Visible = True
+          end
+          item
+            Expanded = False
+            FieldName = 'regiaoDescricao'
             Visible = True
           end>
       end
@@ -428,7 +433,7 @@ inherited TfrmCadCliente: TTfrmCadCliente
       end
       object lblData: TLabel
         Left = 40
-        Top = 212
+        Top = 253
         Width = 81
         Height = 13
         Caption = 'Data Nascimento'
@@ -475,8 +480,8 @@ inherited TfrmCadCliente: TTfrmCadCliente
         OnClick = sbtnCepClick
       end
       object lblStatus: TLabel
-        Left = 167
-        Top = 213
+        Left = 170
+        Top = 253
         Width = 31
         Height = 13
         Caption = 'Status'
@@ -551,26 +556,26 @@ inherited TfrmCadCliente: TTfrmCadCliente
       end
       object edtEmail: TLabeledEdit
         Left = 40
-        Top = 184
+        Top = 226
         Width = 378
         Height = 21
         EditLabel.Width = 24
         EditLabel.Height = 13
         EditLabel.Caption = 'Email'
         MaxLength = 100
-        TabOrder = 9
+        TabOrder = 11
       end
       object edtDataNascimento: TDateEdit
         Tag = 2
         Left = 40
-        Top = 232
+        Top = 272
         Width = 121
         Height = 21
         ClickKey = 114
         DialogTitle = 'Selecione a Data'
         NumGlyphs = 2
         CalendarStyle = csDialog
-        TabOrder = 11
+        TabOrder = 12
       end
       object edtEstado: TLabeledEdit
         Tag = 1
@@ -587,7 +592,7 @@ inherited TfrmCadCliente: TTfrmCadCliente
       object lcbStatus: TDBLookupComboBox
         Tag = 2
         Left = 167
-        Top = 232
+        Top = 272
         Width = 145
         Height = 21
         DataField = 'clienteStatusId'
@@ -595,7 +600,7 @@ inherited TfrmCadCliente: TTfrmCadCliente
         KeyField = 'clienteStatusId'
         ListField = 'descricao'
         ListSource = dtsStatus
-        TabOrder = 12
+        TabOrder = 13
       end
       object lcbTipoPessoa: TDBLookupComboBox
         Tag = 2
@@ -640,6 +645,17 @@ inherited TfrmCadCliente: TTfrmCadCliente
         TabOrder = 10
         OnChange = edtTelefoneChange
       end
+      object edtNumeroCasa: TLabeledEdit
+        Left = 40
+        Top = 184
+        Width = 377
+        Height = 21
+        EditLabel.Width = 79
+        EditLabel.Height = 13
+        EditLabel.Caption = 'N'#250'mero da Casa'
+        MaxLength = 20
+        TabOrder = 9
+      end
     end
     object TabSheet1: TTabSheet
       Caption = 'CRM'
@@ -677,8 +693,7 @@ inherited TfrmCadCliente: TTfrmCadCliente
         Top = 34
         Width = 394
         Height = 21
-        DataField = 'grupoClienteId'
-        DataSource = dtsListagem
+        DataField = 'grupoDescricao'
         KeyField = 'grupoClienteId'
         ListField = 'descricao'
         ListSource = dtsGrupoCliente
@@ -689,7 +704,6 @@ inherited TfrmCadCliente: TTfrmCadCliente
         Top = 34
         Width = 509
         Height = 21
-        DataField = 'segmentoClienteId'
         DataSource = dtsListagem
         KeyField = 'segmentoClienteId'
         ListField = 'descricao'
@@ -701,8 +715,7 @@ inherited TfrmCadCliente: TTfrmCadCliente
         Top = 80
         Width = 394
         Height = 21
-        DataField = 'primeiroContatoClienteId'
-        DataSource = dtsListagem
+        DataField = 'primeiroContatoDescricao'
         KeyField = 'primeiroContatoClienteId'
         ListField = 'descricao'
         ListSource = dtsPrimeiroContato
@@ -713,8 +726,6 @@ inherited TfrmCadCliente: TTfrmCadCliente
         Top = 80
         Width = 509
         Height = 21
-        DataField = 'regiaoClienteId'
-        DataSource = dtsListagem
         KeyField = 'regiaoClienteId'
         ListField = 'descricao'
         ListSource = dtsRegiaoCliente
@@ -768,23 +779,39 @@ inherited TfrmCadCliente: TTfrmCadCliente
   end
   inherited QryListagem: TFDQuery
     SQL.Strings = (
-      'SELECT '#10'  clienteId,'#10'  '
-      'nome,'#10'  '
-      'endereco,'#10'  '
-      'cidade,'#10' '
-      'bairro,'#10'  '
-      'estado,'#10'  '
-      'cep,'#10'  '
-      'telefone,'#10'  '
-      'email,'#10'  '
-      'dataNascimento,'#10'  '
-      'clienteStatusId,'#10'  '
-      'pessoaTipoId,'#10'  '
-      'grupoClienteId,'#10'  '
-      'segmentoClienteId,'#10'  '
-      'primeiroContatoClienteId,'
-      'regiaoClienteId  '
-      #10'FROM clientes')
+      'SELECT '
+      '  c.clienteId,'
+      '  c.nome,'
+      '  c.endereco,'
+      '  c.cidade,'
+      '  c.bairro,'
+      '  c.estado,'
+      '  c.cep,'
+      '  c.telefone,'
+      '  c.email,'
+      '  c.dataNascimento,'
+      '  c.clienteStatusId,'
+      '  c.pessoaTipoId,'
+      '  c.numeroCasa,'
+      ''
+      '  g.descricao AS grupoDescricao,'
+      '  s.descricao AS segmentoDescricao,'
+      '  pc.descricao AS primeiroContatoDescricao,'
+      '  r.descricao AS regiaoDescricao'
+      ''
+      'FROM clientes c'
+      ''
+      'LEFT JOIN grupoCliente g '
+      '  ON g.grupoClienteId = c.grupoClienteId'
+      ''
+      'LEFT JOIN segmentoCliente s '
+      '  ON s.segmentoClienteId = c.segmentoClienteId'
+      ''
+      'LEFT JOIN primeiroContatoCliente pc '
+      '  ON pc.primeiroContatoClienteId = c.primeiroContatoClienteId'
+      ''
+      'LEFT JOIN regiaoCliente r '
+      '  ON r.regiaoClienteId = c.regiaoClienteId')
     Left = 660
     Top = 24
     object QryListagemclienteStatusId: TIntegerField
@@ -859,25 +886,34 @@ inherited TfrmCadCliente: TTfrmCadCliente
       Origin = 'pessoaTipoId'
       Required = True
     end
-    object QryListagemgrupoClienteId: TIntegerField
+    object QryListagemnumeroCasa: TStringField
+      DisplayLabel = 'Numero da Casa'
+      FieldName = 'numeroCasa'
+      Origin = 'numeroCasa'
+    end
+    object QryListagemgrupoDescricao: TStringField
       DisplayLabel = 'Grupo'
-      FieldName = 'grupoClienteId'
-      Origin = 'grupoClienteId'
+      FieldName = 'grupoDescricao'
+      Origin = 'grupoDescricao'
+      Size = 100
     end
-    object QryListagemsegmentoClienteId: TIntegerField
+    object QryListagemsegmentoDescricao: TStringField
       DisplayLabel = 'Segmento'
-      FieldName = 'segmentoClienteId'
-      Origin = 'segmentoClienteId'
+      FieldName = 'segmentoDescricao'
+      Origin = 'segmentoDescricao'
+      Size = 100
     end
-    object QryListagemprimeiroContatoClienteId: TIntegerField
+    object QryListagemprimeiroContatoDescricao: TStringField
       DisplayLabel = 'Primeiro Contato'
-      FieldName = 'primeiroContatoClienteId'
-      Origin = 'primeiroContatoClienteId'
+      FieldName = 'primeiroContatoDescricao'
+      Origin = 'primeiroContatoDescricao'
+      Size = 70
     end
-    object QryListagemregiaoClienteId: TIntegerField
+    object QryListagemregiaoDescricao: TStringField
       DisplayLabel = 'Regi'#227'o'
-      FieldName = 'regiaoClienteId'
-      Origin = 'regiaoClienteId'
+      FieldName = 'regiaoDescricao'
+      Origin = 'regiaoDescricao'
+      Size = 100
     end
   end
   object QryStatus: TFDQuery
@@ -887,8 +923,8 @@ inherited TfrmCadCliente: TTfrmCadCliente
       
         'SELECT clienteStatusId, descricao '#10'FROM clienteStatus'#10'ORDER BY c' +
         'lienteStatusId')
-    Left = 572
-    Top = 288
+    Left = 804
+    Top = 296
     object QryStatusclienteStatusId: TIntegerField
       FieldName = 'clienteStatusId'
       Origin = 'clienteStatusId'
@@ -902,8 +938,8 @@ inherited TfrmCadCliente: TTfrmCadCliente
   end
   object dtsStatus: TDataSource
     DataSet = QryStatus
-    Left = 580
-    Top = 336
+    Left = 812
+    Top = 344
   end
   object QryTipoPessoa: TFDQuery
     Active = True
@@ -912,12 +948,12 @@ inherited TfrmCadCliente: TTfrmCadCliente
       
         'SELECT pessoaTipoId, descricao '#10'FROM pessoaTipo ORDER BY pessoaT' +
         'ipoId')
-    Left = 676
-    Top = 280
+    Left = 852
+    Top = 288
   end
   object dtsTipoPessoa: TDataSource
     DataSet = QryTipoPessoa
-    Left = 676
+    Left = 860
     Top = 336
   end
   object imgStatus: TImageList
@@ -1200,9 +1236,22 @@ inherited TfrmCadCliente: TTfrmCadCliente
     SQL.Strings = (
       'SELECT grupoClienteId, descricao'
       'FROM grupoCliente'
-      'WHERE statusId = 1')
-    Left = 484
-    Top = 288
+      'WHERE statusId = 1'
+      ''
+      'UNION'
+      ''
+      'SELECT grupoClienteId, descricao'
+      'FROM grupoCliente'
+      'WHERE grupoClienteId = :grupoClienteId')
+    Left = 716
+    Top = 296
+    ParamData = <
+      item
+        Name = 'GRUPOCLIENTEID'
+        DataType = ftInteger
+        ParamType = ptInput
+        Value = Null
+      end>
     object QryGrupoClientegrupoClienteId: TFDAutoIncField
       FieldName = 'grupoClienteId'
       Origin = 'grupoClienteId'
@@ -1217,17 +1266,30 @@ inherited TfrmCadCliente: TTfrmCadCliente
   end
   object dtsGrupoCliente: TDataSource
     DataSet = QryGrupoCliente
-    Left = 476
-    Top = 336
+    Left = 708
+    Top = 344
   end
   object QrySegmentoCliente: TFDQuery
     Connection = dtmPrincipal.ConexaoDB
     SQL.Strings = (
       'SELECT segmentoClienteId, descricao'
       'FROM segmentoCliente'
-      'WHERE statusId = 1')
-    Left = 380
-    Top = 288
+      'WHERE statusId = 1'
+      ''
+      'UNION'
+      ''
+      'SELECT segmentoClienteId, descricao'
+      'FROM segmentoCliente'
+      'WHERE segmentoClienteId = :segmentoClienteId')
+    Left = 612
+    Top = 296
+    ParamData = <
+      item
+        Name = 'SEGMENTOCLIENTEID'
+        DataType = ftInteger
+        ParamType = ptInput
+        Value = Null
+      end>
     object QrySegmentoClientesegmentoClienteId: TFDAutoIncField
       FieldName = 'segmentoClienteId'
       Origin = 'segmentoClienteId'
@@ -1242,17 +1304,25 @@ inherited TfrmCadCliente: TTfrmCadCliente
   end
   object dtsSegmentoCliente: TDataSource
     DataSet = QrySegmentoCliente
-    Left = 380
-    Top = 344
+    Left = 612
+    Top = 352
   end
   object QryPrimeiroContato: TFDQuery
     Connection = dtmPrincipal.ConexaoDB
     SQL.Strings = (
-      'SELECT primeiroContatoClienteId, descricao '
+      'SELECT primeiroContatoClienteId, descricao'
       'FROM primeiroContatoCliente'
-      'WHERE statusId = 1')
-    Left = 268
-    Top = 288
+      'WHERE statusId = 1'
+      '   OR primeiroContatoClienteId = :primeiroContatoClienteId')
+    Left = 500
+    Top = 296
+    ParamData = <
+      item
+        Name = 'PRIMEIROCONTATOCLIENTEID'
+        DataType = ftInteger
+        ParamType = ptInput
+        Value = Null
+      end>
     object QryPrimeiroContatoprimeiroContatoClienteId: TFDAutoIncField
       FieldName = 'primeiroContatoClienteId'
       Origin = 'primeiroContatoClienteId'
@@ -1267,18 +1337,25 @@ inherited TfrmCadCliente: TTfrmCadCliente
   end
   object dtsPrimeiroContato: TDataSource
     DataSet = QryPrimeiroContato
-    Left = 276
-    Top = 344
+    Left = 508
+    Top = 352
   end
   object QryRegiaoCliente: TFDQuery
     Connection = dtmPrincipal.ConexaoDB
     SQL.Strings = (
-      'SELECT regiaoClienteId, descricao '
+      'SELECT regiaoClienteId, descricao'
       'FROM regiaoCliente'
       'WHERE statusId = 1'
-      '')
-    Left = 172
-    Top = 288
+      '   OR regiaoClienteId = :regiaoClienteId')
+    Left = 404
+    Top = 296
+    ParamData = <
+      item
+        Name = 'REGIAOCLIENTEID'
+        DataType = ftInteger
+        ParamType = ptInput
+        Value = Null
+      end>
     object QryRegiaoClienteregiaoClienteId: TFDAutoIncField
       FieldName = 'regiaoClienteId'
       Origin = 'regiaoClienteId'
@@ -1293,7 +1370,7 @@ inherited TfrmCadCliente: TTfrmCadCliente
   end
   object dtsRegiaoCliente: TDataSource
     DataSet = QryRegiaoCliente
-    Left = 164
-    Top = 336
+    Left = 396
+    Top = 344
   end
 end

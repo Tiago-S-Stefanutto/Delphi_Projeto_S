@@ -1,4 +1,4 @@
-unit cAtualizacaoTabelaMSSQL;
+Ôªøunit cAtualizacaoTabelaMSSQL;
 
 interface
 
@@ -26,6 +26,7 @@ type
     procedure Produto;
     procedure Vendas;
     procedure VendasItens;
+    procedure StatusUsuario;
     procedure Usuario;
     procedure AcaoAcesso;
     procedure UsuariosAcaoAcesso;
@@ -38,6 +39,7 @@ type
     procedure SegmentoCliente;
     procedure PrimeiroContatoCliente;
     procedure RegiaoCliente;
+    procedure NivelUsuario;
 end;
 
 implementation
@@ -63,6 +65,8 @@ begin
   Produto;
   Vendas;
   VendasItens;
+  NivelUsuario;
+  StatusUsuario;
   Usuario;
   AcaoAcesso;
   UsuariosAcaoAcesso;
@@ -106,7 +110,7 @@ begin
     ') '
     );
 
-    // Õndices
+    // √çndices
     ExecutaDiretoBancoDeDados(
       'CREATE INDEX IDX_Log_DataHora ON LogSistema(dataHora)'
     );
@@ -123,6 +127,27 @@ begin
       'CREATE INDEX IDX_Log_Usuario_Data ON LogSistema(usuarioId, dataHora)'
     );
   end;
+end;
+
+procedure TAtualizacaoTableMSSQL.NivelUsuario;
+begin
+  if not TabelaExiste('nivelUsuario') then
+  ExecutaDiretoBancoDeDados(
+  ' CREATE TABLE nivelUsuario ( '+
+  ' nivelUsuarioId INT PRIMARY KEY not null, '+
+  ' descricao VARCHAR(50) not null '+
+  ' ) '
+  );
+
+  ExecutaDiretoBancoDeDados(
+  'IF NOT EXISTS (SELECT 1 FROM nivelUsuario) '+
+  'BEGIN '+
+  ' INSERT INTO nivelUsuario (nivelUsuarioId, descricao) VALUES '+
+  ' (1, ''Admin''), '+
+  ' (2, ''Gerente''), '+
+  ' (3, ''Usuario'') '+
+  'END'
+  );
 end;
 
 function TAtualizacaoTableMSSQL.TabelaExiste(aNomeTabela: String): Boolean;
@@ -162,8 +187,8 @@ begin
   'IF NOT EXISTS (SELECT 1 FROM pessoaTipo) '+
   'BEGIN '+
   ' INSERT INTO pessoaTipo  (pessoaTipoId, descricao) VALUES '+
-  ' (1, ''FÌsica''), '+
-  ' (2, ''JurÌdica'') '+
+  ' (1, ''F√≠sica''), '+
+  ' (2, ''Jur√≠dica'') '+
   'END'
   );
 
@@ -176,12 +201,19 @@ begin
   begin
     ExecutaDiretoBancoDeDados(
       'CREATE TABLE usuarios ( '+
-      '	 usuarioId int identity(1,1) not null, '+
-      '	 nome varchar(50) not null, '+
-      '	 senha varchar(64) not null, '+
-      '  senhaSalt varchar(64) not null, '+
-      '	 PRIMARY KEY (usuarioId) '+
-      '	) '
+      ' usuarioId int identity(1,1) not null, '+
+      ' nome varchar(50) unique not null, '+
+      ' senha varchar(64) not null, '+
+      ' senhaSalt varchar(64) not null, '+
+      ' nivelUsuarioId int not null default 3, '+
+      ' statusUsuarioId int not null default 2, '+
+
+      ' CONSTRAINT PK_usuarios PRIMARY KEY (usuarioId), '+
+
+      ' CONSTRAINT FK_usuario_nivel '+
+      ' FOREIGN KEY (nivelUsuarioId) '+
+      ' REFERENCES nivelUsuario(nivelUsuarioId) '+
+      ')'
     );
   end;
 
@@ -189,6 +221,8 @@ begin
     oUsuario:=TUsuario.Create(ConexaoDB);
     oUsuario.nome:='admin';
     oUsuario.senha:='admin';
+    oUsuario.nivelUsuarioId := 1;   // ADMIN
+    oUsuario.statusUsuarioId := 1;  // ATIVO
     if not oUsuario.UsuarioExiste(oUsuario.nome) then
       oUsuario.Inserir;
   Finally
@@ -261,6 +295,7 @@ begin
     ' telefone varchar(14) null, '+
     ' email varchar(100) null, '+
     ' dataNascimento datetime null, '+
+    ' casaNumero varchar (20), '+
     ' clienteStatusId int NOT NULL DEFAULT 1, '+
     ' pessoaTipoId int NOT NULL DEFAULT 1, '+
     ' grupoClienteId int NULL, '+
@@ -433,7 +468,7 @@ begin
     ' INSERT INTO clienteStatus (clienteStatusId, descricao) VALUES '+
     ' (1, ''Ativo''), '+
     ' (2, ''Bloqueado''), '+
-    ' (3, ''AtenÁ„o''), '+
+    ' (3, ''Aten√ß√£o''), '+
     ' (4, ''Inativo''), '+
     ' (5, ''Prospecto'') '+
     'END'
@@ -565,6 +600,29 @@ begin
   );
 end;
 
+
+procedure TAtualizacaoTableMSSQL.StatusUsuario;
+begin
+    if not TabelaExiste('statusUsuario') then
+    begin
+      ExecutaDiretoBancoDeDados(
+      'CREATE TABLE statusUsuario( '+
+      ' statusUsuarioId int PRIMARY KEY, '+
+      ' descricao varchar(20) '+
+      ')'
+      );
+    end;
+
+    ExecutaDiretoBancoDeDados(
+    'IF NOT EXISTS (SELECT 1 FROM statusUsuario) '+
+    'BEGIN '+
+    ' INSERT INTO statusUsuario (statusUsuarioId, descricao) VALUES '+
+    ' (1, ''Ativo''), '+
+    ' (2, ''Pendente''), '+
+    ' (3, ''Bloqueado'') '+
+    'END'
+    );
+end;
 
 procedure TAtualizacaoTableMSSQL.Vendas;
 begin

@@ -6,7 +6,8 @@ uses
 Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, uDTMConexao, FireDAC.Stan.Intf, FireDAC.Stan.Option, FireDAC.Stan.Param,
   FireDAC.Stan.Error, FireDAC.DatS, FireDAC.Phys.Intf, FireDAC.DApt.Intf, FireDAC.Stan.Async, FireDAC.DApt, Data.DB,
-  FireDAC.Comp.DataSet, FireDAC.Comp.Client, Datasnap.DBClient, RLReport, RLFilters, RLPDFFilter, RLXLSFilter, RLXLSXFilter;
+  FireDAC.Comp.DataSet, FireDAC.Comp.Client, Datasnap.DBClient, RLReport, RLFilters, RLPDFFilter, RLXLSFilter, RLXLSXFilter,
+  Vcl.Imaging.pngimage;
 
 type
   TfrmRelProVenda = class(TForm)
@@ -65,6 +66,8 @@ type
     RLDBText8: TRLDBText;
     RLDBText7: TRLDBText;
     RLDBText9: TRLDBText;
+    RLDraw4: TRLDraw;
+    RLImage1: TRLImage;
     procedure FormDestroy(Sender: TObject);
   private
     { Private declarations }

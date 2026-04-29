@@ -73,7 +73,20 @@ begin
   if not CampoExisteNaTabela('usuarios','senhaSalt') then
   ExecutaDiretoBancoDeDados('alter table usuarios add senhaSalt varchar(64)');
 
+  if not CampoExisteNaTabela('usuarios','nivelUsuarioId') then
+  begin
+    ExecutaDiretoBancoDeDados('ALTER TABLE usuarios ADD nivelUsuarioId INT NOT NULL DEFAULT 3');
 
+    ExecutaDiretoBancoDeDados('ALTER TABLE usuarios '+
+                              ' CONSTRAINT FK_usuario_nivel '+
+                              ' FOREIGN KEY (nivelUsuarioId) '+
+                              ' REFERENCES nivelUsuario(nivelUsuarioId)');
+  end;
+
+  if not CampoExisteNaTabela('clientes', 'numeroCasa') then
+  begin
+    ExecutaDiretoBancoDeDados('ALTER TABLE clientes ADD numeroCasa VARCHAR(20)');
+  end;
 
   // 1. CAMPO
   if not CampoExisteNaTabela('produtos','tipoEstoqueProdutoId') then

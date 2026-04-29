@@ -4,12 +4,13 @@ inherited frmCadRegiaoCliente: TfrmCadRegiaoCliente
   TextHeight = 13
   inherited pgcPrincipal: TPageControl
     inherited TabListagem: TTabSheet
-      ExplicitLeft = 4
-      ExplicitTop = 24
-      ExplicitWidth = 731
-      ExplicitHeight = 303
       inherited grdListagem: TDBGrid
         Columns = <
+          item
+            Expanded = False
+            FieldName = 'statusId'
+            Visible = True
+          end
           item
             Expanded = False
             FieldName = 'regiaoClienteId'
@@ -19,16 +20,12 @@ inherited frmCadRegiaoCliente: TfrmCadRegiaoCliente
             Expanded = False
             FieldName = 'descricao'
             Visible = True
-          end
-          item
-            Expanded = False
-            FieldName = 'statusId'
-            Visible = True
           end>
       end
     end
     inherited tabManutencao: TTabSheet
-      ExplicitTop = 22
+      ExplicitLeft = 4
+      ExplicitTop = 24
       ExplicitWidth = 731
       ExplicitHeight = 303
       object lblStatus: TLabel

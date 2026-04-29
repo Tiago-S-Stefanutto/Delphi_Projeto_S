@@ -33,8 +33,6 @@ begin
   btnApagar.Visible := False;
   btnGravar.Visible := False;
   btnCancelar.Visible := False;
-  btnNavigator.Visible := False;
-
   tabManutencao.TabVisible := False;
 end;
 

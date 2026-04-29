@@ -11,6 +11,8 @@ uses
 
 type
   TfrmConsultaProdutos = class(TfrmTelaHenrancaConsulta)
+    QryPesquisaprodutoId: TFDAutoIncField;
+    QryPesquisanome: TStringField;
     procedure FormCreate(Sender: TObject);
   private
     { Private declarations }

@@ -8,7 +8,7 @@ uses
   FireDAC.Stan.Error, FireDAC.DatS, FireDAC.Phys.Intf, FireDAC.DApt.Intf, FireDAC.Stan.Async, FireDAC.DApt,
   FireDAC.Comp.DataSet, FireDAC.Comp.Client, Vcl.DBCtrls, Vcl.Grids, Vcl.DBGrids, Vcl.StdCtrls, Vcl.Buttons, Vcl.Mask,
   Vcl.ExtCtrls, Vcl.ComCtrls, RxToolEdit, RxCurrEdit, cCadProduto, uEnum, uDTMConexao,
-  uCadCategorias, cFuncao, uConCategoria, Vcl.Menus, System.StrUtils, Vcl.Imaging.jpeg;
+  uCadCategorias, cFuncao, uConCategoria, Vcl.Menus, System.StrUtils, Vcl.Imaging.jpeg, PngSpeedButton;
 
 type
   TfrmCadProduto = class(TfrmTelaHeranca)
@@ -116,7 +116,7 @@ begin
   oProduto.categoriaId          :=lkpCategoria.KeyValue;
   oProduto.valor                :=edtValor.Value;
   oProduto.quantidade           :=edtQuantidade.Value;
-  oProduto.tipoEstoqueProdutoId := lcbTipoEstoque.KeyValue;
+  oProduto.tipoEstoqueProdutoId :=lcbTipoEstoque.KeyValue;
   if imgImagem.Picture.Bitmap.Empty then
     oProduto.Foto.Assign(nil)
   else
@@ -273,7 +273,7 @@ begin
      lkpCategoria.KeyValue    :=oProduto.categoriaId;
      edtValor.value           :=oProduto.valor;
      edtQuantidade.value      :=oProduto.quantidade;
-     lcbTipoEstoque.KeyValue := oProduto.tipoEstoqueProdutoId;
+     lcbTipoEstoque.KeyValue  :=oProduto.tipoEstoqueProdutoId;
      AtualizarTipoEstoque;
      imgimagem.Picture.Assign(oProduto.foto);
   end

@@ -27,6 +27,11 @@ type
     F_telefone: string;
     F_email: string;
     F_dataNascimento: TDateTime;
+    F_numeroCasa : string;
+    F_grupo : Integer;
+    F_segmento : Integer;
+    F_primeiroContato : Integer;
+    F_regiao : Integer;
 
   public
     constructor Create(aConexao:TFDConnection);
@@ -36,18 +41,23 @@ type
     function Apagar:Boolean;
     function Selecionar(id:Integer):Boolean;
   published
-    property codigo        :Integer    read F_clienteId      write F_clienteId;
-    property nome          :string     read F_nome           write F_nome;
-    property endereco      :string     read F_endereco       write F_endereco;
-    property cidade        :string     read F_cidade         write F_cidade;
-    property bairro        :string     read F_bairro         write F_bairro;
-    property estado        :string     read F_estado         write F_Estado;
-    property cep           :string     read F_cep            write F_Cep;
-    property telefone      :string     read F_telefone       write F_telefone;
-    property email         :string     read F_email          write F_email;
-    property dataNascimento:TDateTime  read F_dataNascimento write F_dataNascimento;
-    property cpf           :string     read F_cpf            write F_cpf;
-    property cnpj          :string     read F_cnpj           write F_cnpj;
+    property codigo          :Integer    read F_clienteId       write F_clienteId;
+    property nome            :string     read F_nome            write F_nome;
+    property endereco        :string     read F_endereco        write F_endereco;
+    property cidade          :string     read F_cidade          write F_cidade;
+    property bairro          :string     read F_bairro          write F_bairro;
+    property estado          :string     read F_estado          write F_Estado;
+    property cep             :string     read F_cep             write F_Cep;
+    property telefone        :string     read F_telefone        write F_telefone;
+    property email           :string     read F_email           write F_email;
+    property dataNascimento  :TDateTime  read F_dataNascimento  write F_dataNascimento;
+    property cpf             :string     read F_cpf             write F_cpf;
+    property cnpj            :string     read F_cnpj            write F_cnpj;
+    property Casa            :string     read F_numeroCasa      write F_numeroCasa;
+    property grupo           :Integer    read F_grupo           write F_grupo;
+    property segmento        :Integer    read F_segmento        write F_segmento;
+    property primeiroContato :Integer    read F_primeiroContato write F_primeiroContato;
+    property regiao          :Integer    read F_regiao          write F_regiao;
   end;
 
 implementation
@@ -143,30 +153,40 @@ begin
     Qry.Connection:=ConexaoDB;
     Qry.SQL.Clear;
     Qry.SQL.Add('UPDATE clientes '+
-                '   SET nome            =:nome '+
-                '       ,endereco       =:endereco '+
-                '       ,cidade         =:cidade '+
-                '       ,bairro         =:bairro '+
-                '       ,estado         =:estado '+
-                '       ,cep            =:cep '+
-                '       ,telefone       =:telefone '+
-                '       ,email          =:email '+
-                '       ,dataNascimento =:dataNascimento '+
-                '       ,cpf            =:cpf ' +
-                '       ,cnpj           =:cnpj '+
+                '   SET nome                      =:nome '+
+                '       ,endereco                 =:endereco '+
+                '       ,cidade                   =:cidade '+
+                '       ,bairro                   =:bairro '+
+                '       ,estado                   =:estado '+
+                '       ,cep                      =:cep '+
+                '       ,numeroCasa               =:numeroCasa '+
+                '       ,telefone                 =:telefone '+
+                '       ,email                    =:email '+
+                '       ,dataNascimento           =:dataNascimento '+
+                '       ,cpf                      =:cpf ' +
+                '       ,cnpj                     =:cnpj '+
+                '       ,grupoClienteId           =:grupoClienteId '+
+                '       ,segmentoClienteId        =:segmentoClienteId '+
+                '       ,primeiroContatoClienteId =:primeiroContatoClienteId '+
+                '       ,regiaoClienteId          =:regiaoClienteId '+
                 ' WHERE clienteId=:clienteId ');
-    Qry.ParamByName('clienteId').AsInteger       :=Self.F_clienteId;
-    Qry.ParamByName('nome').AsString             :=Self.F_nome;
-    Qry.ParamByName('endereco').AsString         :=Self.F_endereco;
-    Qry.ParamByName('cidade').AsString           :=Self.F_cidade;
-    Qry.ParamByName('bairro').AsString           :=Self.F_bairro;
-    Qry.ParamByName('estado').AsString           :=Self.F_estado;
-    Qry.ParamByName('cep').AsString              :=Self.F_cep;
-    Qry.ParamByName('telefone').AsString         :=Self.F_telefone;
-    Qry.ParamByName('email').AsString            :=Self.F_email;
-    Qry.ParamByName('dataNascimento').AsDateTime :=Self.F_dataNascimento;
-    Qry.ParamByName('cpf').AsString              :=Self.F_cpf;
-    Qry.ParamByName('cnpj').AsString             :=Self.F_cnpj;
+    Qry.ParamByName('clienteId').AsInteger                :=Self.F_clienteId;
+    Qry.ParamByName('nome').AsString                      :=Self.F_nome;
+    Qry.ParamByName('endereco').AsString                  :=Self.F_endereco;
+    Qry.ParamByName('cidade').AsString                    :=Self.F_cidade;
+    Qry.ParamByName('bairro').AsString                    :=Self.F_bairro;
+    Qry.ParamByName('estado').AsString                    :=Self.F_estado;
+    Qry.ParamByName('cep').AsString                       :=Self.F_cep;
+    Qry.ParamByName('telefone').AsString                  :=Self.F_telefone;
+    Qry.ParamByName('email').AsString                     :=Self.F_email;
+    Qry.ParamByName('dataNascimento').AsDateTime          :=Self.F_dataNascimento;
+    Qry.ParamByName('cpf').AsString                       :=Self.F_cpf;
+    Qry.ParamByName('cnpj').AsString                      :=Self.F_cnpj;
+    Qry.ParamByName('numeroCasa').AsString                :=Self.F_numeroCasa;
+    Qry.ParamByName('grupoClienteId').AsInteger           :=Self.F_grupo;
+    Qry.ParamByName('segmentoClienteId').AsInteger        :=Self.F_segmento;
+    Qry.ParamByName('primeiroContatoClienteId').AsInteger :=Self.F_primeiroContato;
+    Qry.ParamByName('regiaoClienteId').AsInteger          :=Self.F_regiao;
 
 
     try
@@ -196,11 +216,16 @@ begin
                 '                      bairro,  '+
                 '                      estado, '+
                 '                      cep, '+
+                '                      numeroCasa, '+
                 '                      telefone, '+
                 '                      email, '+
                 '                      cpf, '+
                 '                      cnpj, '+
-                '                      datanascimento) '+
+                '                      datanascimento, '+
+                '                      grupoClienteId '+
+                '                      segmentoClienteId '+
+                '                      primeiroContatoClienteId '+
+                '                      regiaoClienteId) '+
                 'OUTPUT INSERTED.clienteId ' +
                 ' VALUES              (:nome, '+
                 '                      :endereco, '+
@@ -208,24 +233,34 @@ begin
                 '                      :bairro,  '+
                 '                      :estado, '+
                 '                      :cep, '+
+                '                      :numeroCasa, '+
                 '                      :telefone, '+
                 '                      :email, '+
                 '                      :cpf, '+
                 '                      :cnpj, '+
-                '                      :datanascimento)' );
+                '                      :datanascimento '+
+                '                      :grupoClienteId '+
+                '                      :segmentoClienteId '+
+                '                      :primeiroContatoClienteId '+
+                '                      :regiaoClienteId)' );
 
     //preenche os parâmetros
-    Qry.ParamByName('nome').AsString             :=Self.F_nome;
-    Qry.ParamByName('endereco').AsString         :=Self.F_endereco;
-    Qry.ParamByName('cidade').AsString           :=Self.F_cidade;
-    Qry.ParamByName('bairro').AsString           :=Self.F_bairro;
-    Qry.ParamByName('estado').AsString           :=Self.F_estado;
-    Qry.ParamByName('cep').AsString              :=Self.F_cep;
-    Qry.ParamByName('telefone').AsString         :=Self.F_telefone;
-    Qry.ParamByName('email').AsString            :=Self.F_email;
-    Qry.ParamByName('dataNascimento').AsDateTime :=Self.F_dataNascimento;
-    Qry.ParamByName('cpf').AsString              :=Self.F_cpf;
-    Qry.ParamByName('cnpj').AsString             :=Self.F_cnpj;
+    Qry.ParamByName('nome').AsString                      :=Self.F_nome;
+    Qry.ParamByName('endereco').AsString                  :=Self.F_endereco;
+    Qry.ParamByName('cidade').AsString                    :=Self.F_cidade;
+    Qry.ParamByName('bairro').AsString                    :=Self.F_bairro;
+    Qry.ParamByName('estado').AsString                    :=Self.F_estado;
+    Qry.ParamByName('cep').AsString                       :=Self.F_cep;
+    Qry.ParamByName('telefone').AsString                  :=Self.F_telefone;
+    Qry.ParamByName('email').AsString                     :=Self.F_email;
+    Qry.ParamByName('dataNascimento').AsDateTime          :=Self.F_dataNascimento;
+    Qry.ParamByName('cpf').AsString                       :=Self.F_cpf;
+    Qry.ParamByName('cnpj').AsString                      :=Self.F_cnpj;
+    Qry.ParamByName('casaNumero').AsString                :=Self.F_numeroCasa;
+    Qry.ParamByName('grupoClienteId').AsInteger           :=Self.F_grupo;
+    Qry.ParamByName('segmentoClienteId').AsInteger        :=Self.F_segmento;
+    Qry.ParamByName('primeiroContatoClienteId').AsInteger :=Self.F_primeiroContato;
+    Qry.ParamByName('regiaoClienteId').AsInteger          :=Self.F_regiao;
 
     try
       Qry.Open;
@@ -255,30 +290,39 @@ begin
                 '       bairro, '+
                 '       estado, '+
                 '       cep, '+
+                '       numeroCasa, '+
                 '       telefone, '+
                 '       email, '+
                 '       datanascimento, '+
                 '       cpf, '+
-                '       cnpj '+
+                '       cnpj, '+
+                '       grupoClienteId, '+
+                '       segmentoClienteId, '+
+                '       primeiroContatoClienteId, '+
+                '       regiaoClienteId '+
                 '  FROM clientes '+
                 ' WHERE clienteId=:clienteId');
     Qry.ParamByName('clienteId').AsInteger:=id;
     Try
       Qry.Open;
 
-      Self.F_clienteId     := Qry.FieldByName('clienteId').AsInteger;
-      Self.F_nome          := Qry.FieldByName('nome').AsString;
-      Self.F_endereco      := Qry.FieldByName('endereco').AsString;
-      Self.F_cidade        := Qry.FieldByName('cidade').AsString;
-      Self.F_bairro        := Qry.FieldByName('bairro').AsString;
-      Self.F_estado        := Qry.FieldByName('estado').AsString;
-      Self.F_cep           := Qry.FieldByName('cep').AsString;
-      Self.F_telefone      := Qry.FieldByName('telefone').AsString;
-      Self.F_email         := Qry.FieldByName('email').AsString;
-      Self.F_dataNascimento:= Qry.FieldByName('datanascimento').AsDateTime;
-      Self.F_cpf           := Qry.FieldByName('cpf').AsString;
-      Self.F_cnpj          := Qry.FieldByName('cnpj').AsString;
-
+      Self.F_clienteId       := Qry.FieldByName('clienteId').AsInteger;
+      Self.F_nome            := Qry.FieldByName('nome').AsString;
+      Self.F_endereco        := Qry.FieldByName('endereco').AsString;
+      Self.F_cidade          := Qry.FieldByName('cidade').AsString;
+      Self.F_bairro          := Qry.FieldByName('bairro').AsString;
+      Self.F_estado          := Qry.FieldByName('estado').AsString;
+      Self.F_cep             := Qry.FieldByName('cep').AsString;
+      Self.F_telefone        := Qry.FieldByName('telefone').AsString;
+      Self.F_email           := Qry.FieldByName('email').AsString;
+      Self.F_dataNascimento  := Qry.FieldByName('datanascimento').AsDateTime;
+      Self.F_cpf             := Qry.FieldByName('cpf').AsString;
+      Self.F_cnpj            := Qry.FieldByName('cnpj').AsString;
+      Self.F_numeroCasa      := Qry.FieldByName('numeroCasa').AsString;
+      Self.F_grupo           := Qry.FieldByName('grupoClienteId').AsInteger;
+      Self.F_segmento        := Qry.FieldByName('segmentoClienteId').AsInteger;
+      Self.F_primeiroContato := Qry.FieldByName('primeiroContatoClienteId').AsInteger;
+      Self.F_regiao          := Qry.FieldByName('regiaoClienteId').AsInteger;
     Except
       Result:=false;
     End;
