@@ -14,13 +14,14 @@ type
   TfrmCadRegistro = class(TForm)
     Background: TPanel;
     Image1: TImage;
-    btnFechar: TBitBtn;
-    Label2: TLabel;
-    Label1: TLabel;
-    edtUsuario: TEdit;
-    edtSenha: TEdit;
-    Label3: TLabel;
+    Panel1: TPanel;
     btnGravar: TBitBtn;
+    btnFechar: TBitBtn;
+    Label3: TLabel;
+    edtSenha: TEdit;
+    Label2: TLabel;
+    edtUsuario: TEdit;
+    Label1: TLabel;
     procedure btnFecharClick(Sender: TObject);
     procedure btnGravarClick(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
@@ -57,6 +58,12 @@ begin
   begin
     MessageDlg('Usuário já cadastrado', mtInformation, [mbOK], 0);
     edtUsuario.SetFocus;
+    Exit;
+  end;
+
+  if Trim(edtUsuario.Text) = '' then
+  begin
+    MessageDlg('Informe o Nome', mtWarning, [mbOK], 0);
     Exit;
   end;
 

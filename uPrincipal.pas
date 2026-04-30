@@ -65,6 +65,7 @@ type
     {$REGION 'Eventos da TreeView'}
     procedure TreeView1DblClick(Sender: TObject);
     procedure TreeView1CustomDrawItem(Sender: TCustomTreeView; Node: TTreeNode; State: TCustomDrawState; var DefaultDraw: Boolean);
+    procedure TreeView1KeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     {$ENDREGION}
 
     {$REGION 'Eventos dos botões de atalho'}
@@ -491,6 +492,7 @@ begin
   else
     btnNotificacao.Visible := False;
 
+   TreeView1.SetFocus;
 end;
 
 procedure TfrmPrincipal.FormClose(Sender: TObject; var Action: TCloseAction);
@@ -721,6 +723,14 @@ begin
   else if (Grupo = 'Sistema') and (Texto = 'Log (Registros)') then
     TFuncao.CriarForm(TfrmLogSistema, oUsuarioLogado, dtmPrincipal.ConexaoDB);
   {$ENDREGION}
+end;
+
+procedure TfrmPrincipal.TreeView1KeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+begin
+  if (Key = VK_RETURN) and (ActiveControl = TreeView1) then
+  begin
+    TreeView1DblClick(TreeView1);
+  end;
 end;
 
 procedure TfrmPrincipal.TreeView1CustomDrawItem(Sender: TCustomTreeView; Node: TTreeNode; State: TCustomDrawState; var DefaultDraw: Boolean);

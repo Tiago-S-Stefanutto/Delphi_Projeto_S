@@ -9,15 +9,16 @@ uses Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.C
 type
   TfrmLogin = class(TForm)
     Panel2: TPanel;
-    btnFechar: TBitBtn;
     Image1: TImage;
+    Panel1: TPanel;
+    btnRegistro: TBitBtn;
+    btnFechar: TBitBtn;
+    edtSenha: TEdit;
+    edtUsuario: TEdit;
     Label1: TLabel;
     Label2: TLabel;
     Label3: TLabel;
-    edtSenha: TEdit;
-    edtUsuario: TEdit;
     btnAcessar: TBitBtn;
-    btnRegistro: TBitBtn;
     procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
     procedure FormShow(Sender: TObject);
     procedure btnFecharClick(Sender: TObject);
@@ -48,6 +49,11 @@ begin
   finally
     FreeAndNil(frmCadRegistro);
   end;
+
+  edtUsuario.Clear;
+  edtSenha.Clear;
+
+  edtUsuario.SetFocus;
 end;
 
 procedure TfrmLogin.btnAcessarClick(Sender: TObject);
