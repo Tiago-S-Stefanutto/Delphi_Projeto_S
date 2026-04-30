@@ -134,6 +134,7 @@ end;
 procedure TfrmLogin.FormShow(Sender: TObject);
 begin
   bFechar:=False;
+  edtUsuario.SetFocus;
 end;
 
 end.

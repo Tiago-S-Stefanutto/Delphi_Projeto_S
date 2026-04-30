@@ -2,7 +2,6 @@ inherited frmProVenda: TfrmProVenda
   Caption = 'Pedido de Vendas'
   ClientHeight = 492
   ClientWidth = 915
-  ExplicitLeft = -130
   ExplicitWidth = 921
   ExplicitHeight = 521
   PixelsPerInch = 96
@@ -17,6 +16,7 @@ inherited frmProVenda: TfrmProVenda
   inherited pgcPrincipal: TPageControl
     Width = 915
     Height = 451
+    ActivePage = tabManutencao
     ExplicitWidth = 915
     ExplicitHeight = 451
     inherited TabListagem: TTabSheet
@@ -24,7 +24,6 @@ inherited frmProVenda: TfrmProVenda
       ExplicitHeight = 423
       inherited Panel1: TPanel
         Width = 907
-        ExplicitTop = -6
         ExplicitWidth = 907
         object Label2: TLabel [1]
           Left = 416
@@ -503,6 +502,7 @@ inherited frmProVenda: TfrmProVenda
               item
                 Expanded = False
                 FieldName = 'nomeProduto'
+                Width = 64
                 Visible = True
               end
               item
@@ -513,6 +513,7 @@ inherited frmProVenda: TfrmProVenda
               item
                 Expanded = False
                 FieldName = 'valorUnitario'
+                Width = 64
                 Visible = True
               end
               item

@@ -526,7 +526,7 @@ begin
   Sheet.Columns.AutoFit;
 
   // Salvar
-  Workbook.SaveAs(GetDesktopPath + '\Venda.xlsx');
+  Workbook.SaveAs(GetDesktopPath + '\Vendas.xlsx');
 
   Workbook.Close;
   Excel.Quit;

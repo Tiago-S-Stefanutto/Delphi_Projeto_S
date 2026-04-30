@@ -9,9 +9,12 @@ inherited frmCadProduto: TfrmCadProduto
   inherited pgcPrincipal: TPageControl
     Width = 752
     Height = 388
+    ActivePage = tabManutencao
     ExplicitWidth = 752
     ExplicitHeight = 388
     inherited TabListagem: TTabSheet
+      ExplicitLeft = 4
+      ExplicitTop = 24
       ExplicitWidth = 744
       ExplicitHeight = 360
       object ImagemProduto: TImage [0]
@@ -292,7 +295,9 @@ inherited frmCadProduto: TfrmCadProduto
           Top = 1
           Width = 144
           Height = 144
+          Cursor = crHandPoint
           Align = alClient
+          DragCursor = crHandPoint
           PopupMenu = ppmImage
           ExplicitLeft = -3
           ExplicitTop = 41
