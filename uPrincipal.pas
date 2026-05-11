@@ -1,48 +1,55 @@
-﻿unit uPrincipal;
+unit uPrincipal;
 
-{$REGION 'Interface'}
 interface
 
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants,
-  System.Classes, Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.Menus,
-  uDTMConexao, Enter, uFrmAtualizaDB, uProVenda, uRelCategoria, uRelClienteFicha,
-  uRelProduto, uRelCliente, uRelProdutoComCategoria, uSelecionarData,
-  uRelVendaPorData, uCadUsuario, uAlterarSenha, cUsuarioLogado, Vcl.ComCtrls,
-  uLogin, uCadAcaoAcesso, cAcaoAcesso, RLReport, uUsuarioVsAcoes, uTelaHeranca,
-  FireDAC.Stan.Intf, FireDAC.Stan.Option, FireDAC.Stan.Param, FireDAC.Stan.Error,
-  FireDAC.DatS, FireDAC.Phys.Intf, FireDAC.DApt.Intf, FireDAC.Stan.Async,
-  FireDAC.DApt, Data.DB, FireDAC.Comp.DataSet, FireDAC.Comp.Client, Vcl.ExtCtrls,
-  uDtmGrafico, VclTee.TeeGDIPlus, VCLTee.TeEngine, VCLTee.Series,
-  VCLTee.TeeProcs, VCLTee.Chart, VCLTee.DBChart, cArquivoIni, cFuncao,
-  cAtualizacaoCampoMSSQL, Vcl.Buttons, System.ImageList, Vcl.ImgList,Vcl.Imaging.pngimage
-  , cLog, uLogSistema, uCadGrupoCliente, uCadSegmentoCliente,
-  uCadPrimeiroContatoCliente, uCadRegiaoCliente, PngSpeedButton;
+  System.Classes, Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs,
+  Vcl.Menus, uDTMConexao, Enter, uFrmAtualizaDB, uProVenda,
+  uRelCategoria, uRelClienteFicha, uRelProduto, uRelCliente,
+  uRelProdutoComCategoria, uSelecionarData, uRelVendaPorData,
+  uCadUsuario, uAlterarSenha, cUsuarioLogado, Vcl.ComCtrls,
+  uLogin, uCadAcaoAcesso, cAcaoAcesso, RLReport, uUsuarioVsAcoes,
+  uTelaHeranca, FireDAC.Stan.Intf, FireDAC.Stan.Option,
+  FireDAC.Stan.Param, FireDAC.Stan.Error, FireDAC.DatS,
+  FireDAC.Phys.Intf, FireDAC.DApt.Intf, FireDAC.Stan.Async,
+  FireDAC.DApt, Data.DB, FireDAC.Comp.DataSet,
+  FireDAC.Comp.Client, Vcl.ExtCtrls, uDtmGrafico,
+  VclTee.TeeGDIPlus, VCLTee.TeEngine, VCLTee.Series,
+  VCLTee.TeeProcs, VCLTee.Chart, VCLTee.DBChart,
+  cArquivoIni, cFuncao, cAtualizacaoCampoMSSQL,
+  Vcl.Buttons, System.ImageList, Vcl.ImgList,
+  Vcl.Imaging.pngimage, cLog, uLogSistema,
+  uCadGrupoCliente, uCadSegmentoCliente,
+  uCadPrimeiroContatoCliente, uCadRegiaoCliente,
+  PngSpeedButton, Vcl.StdCtrls, JvExControls,
+  JvButton, JvTransparentButton;
 
 type
   TfrmPrincipal = class(TForm)
-
-    {$REGION 'Componentes visuais'}
     stbPrincipal: TStatusBar;
     GridPanel1: TGridPanel;
     tmrAtualizaDashboard: TTimer;
     TreeView1: TTreeView;
     pnlTop: TPanel;
-    {$ENDREGION}
 
-    {$REGION 'Gráficos do Dashboard'}
     DBChart1: TDBChart;
     DBChart2: TDBChart;
-    Series2: TPieSeries;
     DBChart3: TDBChart;
     DBChart4: TDBChart;
+
+    Series1: THorizBarSeries;
+    Series2: TPieSeries;
     Series3: TPieSeries;
     Series4: TFastLineSeries;
-    Series1: THorizBarSeries;
+
     imgTree: TImageList;
     Panel1: TPanel;
     imgBackground: TImage;
     imgHeader: TImage;
+    imgLogo: TImage;
+    imgNotificacao: TImageList;
+
     btnAterarSenha: TPngSpeedButton;
     btnCategoria: TPngSpeedButton;
     btnCliente: TPngSpeedButton;
@@ -51,24 +58,20 @@ type
     btnLog: TPngSpeedButton;
     btnProduto: TPngSpeedButton;
     btnVenda: TPngSpeedButton;
-    imgLogo: TImage;
-    imgNotificacao: TImageList;
     btnNotificacao: TPngSpeedButton;
-    {$ENDREGION}
 
-    {$REGION 'Eventos do formulário'}
     procedure FormCreate(Sender: TObject);
-    procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure FormShow(Sender: TObject);
-    {$ENDREGION}
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
+    procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
 
-    {$REGION 'Eventos da TreeView'}
     procedure TreeView1DblClick(Sender: TObject);
-    procedure TreeView1CustomDrawItem(Sender: TCustomTreeView; Node: TTreeNode; State: TCustomDrawState; var DefaultDraw: Boolean);
-    procedure TreeView1KeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
-    {$ENDREGION}
+    procedure TreeView1CustomDrawItem(Sender: TCustomTreeView;
+      Node: TTreeNode; State: TCustomDrawState;
+      var DefaultDraw: Boolean);
+    procedure TreeView1KeyDown(Sender: TObject;
+      var Key: Word; Shift: TShiftState);
 
-    {$REGION 'Eventos dos botões de atalho'}
     procedure btnDashboardClick(Sender: TObject);
     procedure btnVendaClick(Sender: TObject);
     procedure btnDesligarClick(Sender: TObject);
@@ -78,37 +81,26 @@ type
     procedure btnAterarSenhaClick(Sender: TObject);
     procedure btnLogClick(Sender: TObject);
     procedure btnNotificacaoClick(Sender: TObject);
-    {$ENDREGION}
 
-    {$REGION 'Eventos de menu / sistema'}
     procedure tmrAtualizaDashboardTimer(Sender: TObject);
-    {$ENDREGION}
 
-    {$REGION 'Procedures públicas de status/clientes'}
     procedure AtualizarStatusCliente;
-    {$ENDREGION}
 
   private
-    {$REGION 'Membros privados'}
     TeclaEnter: TMREnter;
+
     procedure AtualizacaoBancoDados(aForm: TfrmAtualizaDB);
     procedure VendaporDataClick(Sender: TObject);
     procedure AtualizarIconeNotificacao;
-    {$ENDREGION}
 
   public
-    {$REGION 'Membros públicos'}
     procedure AtualizarDashBoard;
-    {$ENDREGION}
-
   end;
 
 var
   frmPrincipal: TfrmPrincipal;
   oUsuarioLogado: TUsuarioLogado;
   Log: TLog;
-
-{$ENDREGION}
 
 implementation
 
@@ -117,14 +109,11 @@ implementation
 uses
   uCadCategorias, uCadCliente, uCadProduto, cAtualizacaoBandoDeDados;
 
-// =============================================================================
-
-{$REGION 'Inicialização e encerramento do formulário'}
-
 procedure TfrmPrincipal.FormCreate(Sender: TObject);
 var
   NoCadastro, NoMov, NoRel, NoUsuario, NoSistema, NoCRM: TTreeNode;
 begin
+  KeyPreview := True;
   {$REGION 'Verificação e criação do arquivo INI'}
   if not FileExists(TArquivoIni.ArquivoIni) then
   begin
@@ -143,11 +132,9 @@ begin
   end;
   {$ENDREGION}
 
-  {$REGION 'Tela de atualização do banco'}
   frmAtualizaDB := TfrmAtualizaDB.Create(Self);
   frmAtualizaDB.Show;
   frmAtualizaDB.Refresh;
-  {$ENDREGION}
 
   {$REGION 'Conexão com o banco de dados'}
   dtmPrincipal := TdtmPrincipal.Create(Self);
@@ -186,15 +173,11 @@ begin
   dtmPrincipal.ConexaoDB.Connected := True;
   {$ENDREGION}
 
-  {$REGION 'TeclaEnter'}
   TeclaEnter := TMREnter.Create(Self);
   TeclaEnter.FocusEnabled := True;
   TeclaEnter.FocusColor := clInfoBk;
-  {$ENDREGION}
 
-  {$REGION 'Atualização do banco de dados'}
   AtualizacaoBancoDados(frmAtualizaDB);
-  {$ENDREGION}
 
   {$REGION 'Registro das ações de acesso'}
   TAcaoAcesso.CriarAcoes(TfrmCadCategorias, DtmPrincipal.ConexaoDB);
@@ -221,20 +204,16 @@ begin
   TAcaoAcesso.PreencherUsuariosVsAcoes(dtmPrincipal.ConexaoDB);
   {$ENDREGION}
 
-  {$REGION 'Dashboard inicial'}
   dtmGrafico := TdtmGrafico.Create(Self);
   AtualizarDashBoard;
   frmAtualizaDB.Free;
-  {$ENDREGION}
 
-  {$REGION 'Atualização de status dos clientes'}
   try
     AtualizarStatusCliente;
   except
     on E: Exception do
       ShowMessage('Erro ao atualizar status dos clientes: ' + E.Message);
   end;
-  {$ENDREGION}
 
   {$REGION 'Montagem da TreeView'}
   TreeView1.Items.Clear;
@@ -343,7 +322,7 @@ begin
     end;
   {$ENDREGION}
 
-  {$REGION 'Usuátios'}
+  {$REGION 'Usuários'}
     // Usuários
     NoUsuario := TreeView1.Items.Add(nil, 'Usuários');
     NoUsuario.ImageIndex := 3;
@@ -370,7 +349,7 @@ begin
 
    NoSistema := TreeView1.Items.Add(nil, 'Sistema');
    NoSistema.ImageIndex := 6;
-   NoSIstema.SelectedIndex := 6;
+   NoSistema.SelectedIndex := 6;
 
    with TreeView1.Items.AddChild(NoSistema, 'Log (Registros)') do
     begin
@@ -402,7 +381,23 @@ begin
 
 end;
 
-{$REGION 'Notificação'}
+procedure TfrmPrincipal.FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+begin
+  if Key = VK_ESCAPE then
+  begin
+    if Screen.FormCount = 1 then
+    begin
+      if MessageDlg('Deseja realmente fechar a aplicação?',
+                    mtConfirmation,
+                    [mbYes, mbNo],
+                    0) = mrYes then
+      begin
+        Application.Terminate;
+      end;
+    end;
+  end;
+end;
+
 procedure TfrmPrincipal.AtualizarIconeNotificacao;
 var
   Qry: TFDQuery;
@@ -471,7 +466,6 @@ begin
     FreeAndNil(Bmp);
   end;
 end;
-{$ENDREGION}
 
 procedure TfrmPrincipal.FormShow(Sender: TObject);
 begin
@@ -508,12 +502,6 @@ begin
     FreeAndNil(oUsuarioLogado);
 end;
 
-{$ENDREGION}
-
-// =============================================================================
-
-{$REGION 'Banco de dados — atualização estrutural'}
-
 procedure TfrmPrincipal.AtualizacaoBancoDados(aForm: TfrmAtualizaDB);
 var
   oAtualizarMSSQL: TAtualizaBancoDeDadosMSSQL;
@@ -527,12 +515,6 @@ begin
       FreeAndNil(oAtualizarMSSQL);
   end;
 end;
-
-{$ENDREGION}
-
-// =============================================================================
-
-{$REGION 'Dashboard'}
 
 procedure TfrmPrincipal.AtualizarDashBoard;
 begin
@@ -562,12 +544,6 @@ begin
   AtualizarDashBoard;
   AtualizarIconeNotificacao;
 end;
-
-{$ENDREGION}
-
-// =============================================================================
-
-{$REGION 'Botões de atalho (pnlTop)'}
 
 procedure TfrmPrincipal.btnClienteClick(Sender: TObject);
 begin
@@ -650,10 +626,6 @@ begin
   end;
 end;
 
-{$ENDREGION}
-
-// =============================================================================
-
 {$REGION 'TreeView — navegação e desenho'}
 
 procedure TfrmPrincipal.TreeView1DblClick(Sender: TObject);
@@ -668,7 +640,7 @@ begin
   if Assigned(TreeView1.Selected.Parent) then
     Grupo := TreeView1.Selected.Parent.Text
   else
-    Exit; // clicou em um nó raiz
+    Exit;
 
   {$REGION 'Cadastro'}
   if (Grupo = 'Cadastro') and (Texto = 'Cliente') then
@@ -734,9 +706,6 @@ begin
 end;
 
 procedure TfrmPrincipal.TreeView1CustomDrawItem(Sender: TCustomTreeView; Node: TTreeNode; State: TCustomDrawState; var DefaultDraw: Boolean);
-var
-  R: TRect;
-  TextX: Integer;
 begin
   DefaultDraw := True;
 
@@ -775,10 +744,6 @@ end;
 
 {$ENDREGION}
 
-// =============================================================================
-
-{$REGION 'Relatório — Venda por Data'}
-
 procedure TfrmPrincipal.VendaporDataClick(Sender: TObject);
 begin
   try
@@ -806,12 +771,6 @@ begin
   end;
 end;
 
-{$ENDREGION}
-
-// =============================================================================
-
-{$REGION 'Clientes — atualização de status'}
-
 procedure TfrmPrincipal.AtualizarStatusCliente;
 var
   Qry: TFDQuery;
@@ -836,8 +795,4 @@ begin
       FreeAndNil(Qry);
   end;
 end;
-
-{$ENDREGION}
-
 end.
-
